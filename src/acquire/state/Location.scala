@@ -1,0 +1,30 @@
+package acquire.state
+
+class Location private[acquire](val row: Int, val col: Int, nRows: Int, nCols: Int) {
+  private val delta = List((0,1), (0, -1), (-1, 0), (1, 0))
+
+  def neighbors: List[Location] = for {
+    (dr, dc) <- delta
+    if inRange(dr+row, 0, nRows) && inRange(dc+col, 0, nCols)
+  } yield Locations.Store(row+dr)(col+dc)
+
+  override def toString: String = (col + 1).toString + numToChar(row).get.toString
+
+  private def inRange(num: Int, lower: Int, upper: Int) = lower <= num && num < upper
+
+  private def numToChar(num: Int): Option[Char] =
+    if (num >= 0 && num < 26) Some((num+65).toChar) else None
+}
+
+// Static store of locations
+object Locations {
+  val Rows = 9
+  val Cols = 12
+  val Store: IndexedSeq[IndexedSeq[Location]] =
+    (0 until Rows).map(row => (0 until Cols).map(col => new Location(row, col, Rows, Cols)))
+
+  def get(loc: String): Location =
+    loc.splitAt(loc.length()-1) match {
+      case (col, row) => Store(row.charAt(0) - 65)(col.toInt - 1)
+    }
+}
