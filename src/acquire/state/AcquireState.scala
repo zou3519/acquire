@@ -223,7 +223,8 @@ class AcquireState private(config: Config, _tileRack: Vector[mutable.HashSet[Loc
     // replace any dead tiles
     _tileRack(player).foreach(tile => if (areNeighborsSafe(tile)) _tileRack(player) -= tile)
     while (tileRack(player).size < 6 && board.tiles.nonEmpty) {
-      _tileRack(player) += board.tiles.dequeue()
+      val nextTile = board.tiles.dequeue()
+      _tileRack(player) += nextTile
     }
 
     beginTurn(nextPlayer(player))
@@ -233,6 +234,7 @@ class AcquireState private(config: Config, _tileRack: Vector[mutable.HashSet[Loc
   private def proceedToDecision(player: Int, desiredMoveType: MoveType): Unit = {
     this._currentPlayer = player
     this._expectedMoveType = desiredMoveType
+
     desiredMoveType match {
       case MoveType.MergeCorpT => beginMerger()
       case _ => ()
