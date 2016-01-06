@@ -1,0 +1,22 @@
+/* .list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-text-fill: white;
+} */
+
+.list-cell {
+    -fx-text-fill: #aaaaaa;
+    -fx-cell-hover-color: #0093ff;
+
+}
+
+.list-cell:odd {
+    -fx-background-color: #444444;
+}
+
+.list-cell:even {
+    -fx-background-color: #333333;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #0093ff;
+    -fx-text-fill: white;
+}
