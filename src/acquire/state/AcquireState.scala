@@ -9,7 +9,7 @@ import mcts.State
 
 import scala.util.Random
 
-class AcquireState private(config: Config, _tileRack: Vector[mutable.HashSet[Location]],
+class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet[Location]],
                            val board: Board, val sheet: ScoreSheet) extends State[Move] {
   val numPlayers: Int = config.players.length
   val numCorps: Int = config.corps.length

@@ -43,7 +43,7 @@ class ScoreSheetImpl private(config: Config, _shares: Array[Array[Int]], _cash: 
     require(price <= _cash(player), "enough cash for purchase")
 
     _bankShares(corp) -= amt
-    _shares(corp)(player) += 1
+    _shares(corp)(player) += amt
     _cash(player) -= price
   }
   override def sellShares(player: Int, corp: Int, amt: Int): Unit = {

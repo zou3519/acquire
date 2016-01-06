@@ -1,5 +1,8 @@
 package acquire.state
 
+import scala.collection.mutable
+import scala.util.Random
+
 class Location private[acquire](val row: Int, val col: Int, nRows: Int, nCols: Int) {
   private val delta = List((0,1), (0, -1), (-1, 0), (1, 0))
 
@@ -27,4 +30,10 @@ object Locations {
     loc.splitAt(loc.length()-1) match {
       case (col, row) => Store(row.charAt(0) - 65)(col.toInt - 1)
     }
+
+  def newTilesQueue: mutable.Queue[Location]  =
+    new mutable.Queue[Location] ++= Random.shuffle(for {
+      row <- 0 until Locations.Rows
+      col <- 0 until Locations.Cols
+    } yield Locations.Store(row)(col))
 }
