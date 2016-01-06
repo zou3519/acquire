@@ -160,7 +160,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   }
 
   /* next state does not mutate but moveInPlace does */
-  override def nextState(move: Move): State[Move] = {
+  override def nextState(move: Move): AcquireState = {
     val next = copy
     next.moveInPlace(move)
     next

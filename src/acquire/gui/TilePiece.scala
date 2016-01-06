@@ -5,9 +5,10 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.{TextAlignment, FontWeight, Font}
 
+import acquire.engine.Engine
 import acquire.state._
 
-class TilePiece(state: AcquireState, row: Int, col: Int) extends Actor {
+class TilePiece(engine: Engine, row: Int, col: Int) extends Actor {
   private val loc: String = Locations.Store(row)(col).toString
   private val size: Int = 48
   private val font: Font = Font.font("Arial", FontWeight.BOLD, 14)
@@ -22,14 +23,15 @@ class TilePiece(state: AcquireState, row: Int, col: Int) extends Actor {
   def setType(tile: Tile): Unit = {
     empty = tile.isInstanceOf[EmptyTile]
     tileColor = Colors.colorOf(tile)
-    if (tile.isInstanceOf[CorpTile]) {
-      corpName = state.config.corpName(tile.asInstanceOf[CorpTile].corpId)
+    tile match {
+      case CorpTile(id) => corpName = engine.state.config.corpName(id)
+      case _ => ()
     }
   }
 
   override def update(): Unit = {
-    setType(state.board.tileAt(row,col))
-    if (state.tileRack(state.currentPlayer).contains(Locations.Store(row)(col))) {
+    setType(engine.state.board.tileAt(row,col))
+    if (engine.state.tileRack(engine.state.currentPlayer).contains(Locations.Store(row)(col))) {
       highlighted = true
     } else {
       highlighted = false

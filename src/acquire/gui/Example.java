@@ -1,5 +1,6 @@
 package acquire.gui;
 
+import acquire.engine.Engine;
 import acquire.state.AcquireState;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -36,10 +37,6 @@ public class Example extends Application {
         Canvas canvas = new Canvas(1024, 768);
         root.getChildren().add(canvas);
 
-        History history = new History();
-        history.setPosition(10, 470);
-        history.addToGroup(root);
-
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         scene.setOnMouseEntered(event -> MouseUtil.isMouseInScene = true);
@@ -52,16 +49,21 @@ public class Example extends Application {
         scene.setOnMouseReleased(event -> MouseUtil.isMousePressed = false);
         scene.setOnMouseMoved(event -> MouseUtil.setPosition(event.getSceneX(), event.getSceneY()));
 
-        AcquireState state = Default.newState();
+
+        Engine engine = Default.newEngine();
         for (int i = 0; i < 150; i++) {
-            state.moveInPlace(state.randomMove().get());
+            engine.makeMove(engine.state().randomMove().get());
         }
 
         List<Actor> actors = new ArrayList<>();
-        Board board = new Board(state);
+        Board board = new Board(engine);
         board.setPosition(10,10);
-        ScoreSheet sheet = new ScoreSheet(state);
+        ScoreSheet sheet = new ScoreSheet(engine);
         sheet.setPosition(684, 34);
+
+        History history = new History(engine);
+        history.setPosition(10, 470);
+        history.addToGroup(root);
 
         actors.add(sheet);
         actors.add(board);

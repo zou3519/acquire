@@ -3,6 +3,7 @@ package acquire.gui
 import javafx.geometry.Rectangle2D
 import javafx.scene.canvas.GraphicsContext
 
+import acquire.engine.Engine
 import acquire.state.{Config, AcquireState}
 
 /**
@@ -32,6 +33,7 @@ trait Actor {
 object Default {
   private val corps = Seq("Tower", "Luxor", "American", "Worldwide", "Festival", "Imperial", "Continental").zip(
     Seq(200, 200, 300, 300, 300, 400, 400))
-  private val playerNames = Seq("alpha", "beta","gamma","delta")
+  private val playerNames = Seq("p0.alpha", "p1.beta","p2.gamma","p3.delta")
   def newState = new AcquireState(new Config(playerNames, corps))
+  def newEngine = new Engine(playerNames)
 }

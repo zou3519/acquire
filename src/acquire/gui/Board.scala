@@ -2,11 +2,11 @@ package acquire.gui
 
 import javafx.scene.canvas.GraphicsContext
 
-import acquire.state.AcquireState
+import acquire.engine.Engine
 
-class Board(val state: AcquireState) extends Actor {
+class Board(val engine: Engine) extends Actor {
   val tiles: IndexedSeq[IndexedSeq[TilePiece]] = for (row <- 0 until 9)
-    yield for (col <- 0 until 12) yield new TilePiece(state, row, col)
+    yield for (col <- 0 until 12) yield new TilePiece(engine, row, col)
 
   override def setPosition(x: Double, y: Double): Unit = {
     super.setPosition(x, y)

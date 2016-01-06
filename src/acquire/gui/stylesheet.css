@@ -5,7 +5,7 @@
 .list-cell {
     -fx-text-fill: #aaaaaa;
     -fx-cell-hover-color: #0093ff;
-
+    -fx-alignment: center;
 }
 
 .list-cell:odd {
