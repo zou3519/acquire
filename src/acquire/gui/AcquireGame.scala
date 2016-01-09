@@ -1,6 +1,7 @@
 package acquire.gui
 
 import acquire.engine.{PlayerType, Engine}
+import acquire.gui.prompt.CorpPrompt
 import acquire.gui.theatre.Actor
 import acquire.state._
 
@@ -39,13 +40,111 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
   }
 
   private def setupHumanBuyShares() = {
-    val prompt: CorpPrompt = new BuySharesPrompt(engine)
+    val prompt: CorpPrompt = createBuySharesPrompt
     worldOpt.get.addActor(prompt, 624, 470)
     prompt.submitButton.registerClickHandler((Unit) => {
       val move: Move = BuyShares(engine.state.currentPlayer, prompt.selectedCorps)
       engine.makeMove(move)
       worldOpt.get.removeActor(prompt)
       hasSetupHumanMove = false
+    })
+  }
+
+  private def createBuySharesPrompt: CorpPrompt = {
+    val message = "Choose shares to purchase"
+    val corpChoices = engine.state.config.corps collect {
+      case corp if engine.state.sheet.hasChain(corp) => corp
+    }
+    val canCheckoutCorp: ((Int, Map[Int, Int]) => Boolean) = (corp, currentSharesMap) => {
+      val totalShares = currentSharesMap.values.sum
+      if (totalShares >= 3) false
+      else {
+        val updatedSharesMap: Map[Int, Int] = currentSharesMap.updated(corp,
+          if (currentSharesMap.contains(corp)) currentSharesMap(corp) + 1 else 1)
+        val correspondingMove: Move = BuyShares(engine.state.currentPlayer, updatedSharesMap)
+        engine.state.isLegalMove(correspondingMove)
+      }
+    }
+    val queueLike = false
+    new CorpPrompt(engine, message, corpChoices, canCheckoutCorp, queueLike)
+  }
+
+  private def createFoundCorpPrompt: CorpPrompt = {
+    val message = "Choose a corp to form"
+    val corpChoices = engine.state.config.corps collect {
+      case corp if !engine.state.sheet.hasChain(corp) => corp
+    }
+    val canCheckoutCorp: ((Int, Map[Int, Int]) => Boolean) = (corp, currentSharesMap) => {
+      currentSharesMap.keySet.isEmpty
+    }
+    val queueLike = true
+    new CorpPrompt(engine, message, corpChoices, canCheckoutCorp, queueLike)
+  }
+
+  private def createMergeSurvivorPrompt: CorpPrompt = {
+    val message = "Choose the corp that will survive the merger"
+    val corpChoices = engine.state.n1CorpsForMerge.get
+    val canCheckoutCorp: ((Int, Map[Int, Int]) => Boolean) = (corp, currentSharesMap) => {
+      currentSharesMap.keySet.isEmpty
+    }
+    val queueLike = true
+    new CorpPrompt(engine, message, corpChoices, canCheckoutCorp, queueLike)
+  }
+
+  private def createMergeEatingPrompt(predatorCorp: Int): CorpPrompt = {
+    val message = "Choose the corp that will be merged in\n(first, if there are multiple)"
+    val corpChoices =
+      for {
+        corp <- engine.state.n1CorpsForMerge.get ++ (if (engine.state.n2CorpsForMerge.isDefined) engine.state.n2CorpsForMerge.get else Seq())
+        if corp != predatorCorp
+      } yield corp
+    val canCheckoutCorp: ((Int, Map[Int, Int]) => Boolean) = (corp, currentSharesMap) => {
+      currentSharesMap.keySet.isEmpty
+    }
+    val queueLike = true
+    new CorpPrompt(engine, message, corpChoices, canCheckoutCorp, queueLike)
+  }
+
+  private def setupHumanMergeCorp1() = {
+    val prompt: CorpPrompt = createMergeSurvivorPrompt
+    worldOpt.get.addActor(prompt, 624, 470)
+    prompt.submitButton.registerClickHandler((Unit) => {
+      val selectedCorps = prompt.selectedCorps
+      if (selectedCorps.nonEmpty) {
+        assert(selectedCorps.size == 1)
+        worldOpt.get.removeActor(prompt)
+        setupHumanMergeCorp2(selectedCorps.keySet.head)
+      }
+    })
+  }
+
+  private def setupHumanMergeCorp2(predator: Int) = {
+    val prompt: CorpPrompt = createMergeEatingPrompt(predator)
+    worldOpt.get.addActor(prompt, 624, 470)
+    prompt.submitButton.registerClickHandler((Unit) => {
+      val selectedCorps = prompt.selectedCorps
+      if (selectedCorps.nonEmpty) {
+        assert(selectedCorps.size == 1)
+        val move = MergeCorp(engine.state.currentPlayer, selectedCorps.keySet.head, predator)
+        engine.makeMove(move)
+        worldOpt.get.removeActor(prompt)
+        hasSetupHumanMove = false
+      }
+    })
+  }
+
+  private def setupHumanFoundCorp() = {
+    val prompt: CorpPrompt = createFoundCorpPrompt
+    worldOpt.get.addActor(prompt, 624, 470)
+    prompt.submitButton.registerClickHandler((Unit) => {
+      val selectedCorps = prompt.selectedCorps
+      if (selectedCorps.nonEmpty) {
+        assert(selectedCorps.size == 1)
+        val move = FoundCorp(engine.state.currentPlayer, selectedCorps.keySet.head)
+        engine.makeMove(move)
+        worldOpt.get.removeActor(prompt)
+        hasSetupHumanMove = false
+      }
     })
   }
 
@@ -56,8 +155,8 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
     engine.state.expectedMoveType match {
       case MoveType.EndTurnT => aiMove(); hasSetupHumanMove = false
       case MoveType.PlaceTileT => setupHumanPlaceTile()
-      case MoveType.FoundCorpT => aiMove(); hasSetupHumanMove = false
-      case MoveType.MergeCorpT => aiMove(); hasSetupHumanMove = false
+      case MoveType.FoundCorpT => setupHumanFoundCorp()
+      case MoveType.MergeCorpT => setupHumanMergeCorp1()
       case MoveType.MergeTransactionT => aiMove(); hasSetupHumanMove = false
       case MoveType.BuySharesT => setupHumanBuyShares()
     }

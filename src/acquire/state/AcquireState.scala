@@ -32,6 +32,8 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   def mergerOccurring  = _mergerOccurring
   def predatorCorp     = _predatorCorp
   def preyCorp         = _preyCorp
+  def n1CorpsForMerge  = _n1CorpsForMerge
+  def n2CorpsForMerge  = _n2CorpsForMerge
 
   def this(config: Config) = {
     this(config, Vector.fill(config.players.length)(new mutable.HashSet), new BoardImpl(), new ScoreSheetImpl(config))

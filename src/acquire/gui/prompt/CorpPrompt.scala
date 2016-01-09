@@ -1,4 +1,4 @@
-package acquire.gui
+package acquire.gui.prompt
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
@@ -6,21 +6,26 @@ import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 
 import acquire.engine.Engine
-import acquire.gui.theatre.{World, Actor}
+import acquire.gui.Button
+import acquire.gui.theatre.{Actor, World}
 
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * A CorpPrompt is a prompt asking a user to select some number
-  * of corporations.
+  * A CorpPrompt is a prompt asking a user to select some number of corporations.
+  * @param engine The game engine
+  * @param message The message to display on the screen
+  * @param corpChoices The choices of corps to checkout
+  * @param canCheckoutCorp Can we checkout a corp based on what's currently checked out?
   */
-abstract class CorpPrompt(engine: Engine, val message: String) extends Actor {
+class CorpPrompt(engine: Engine, val message: String, val corpChoices: Seq[Int],
+                 val canCheckoutCorp: ((Int, Map[Int, Int]) => Boolean), val queueLike: Boolean) extends Actor {
   _height = 284
   _width = 388
 
   val submitButton: Button = new Button(50, 50, Color.web("0093ff"), Color.web("0093ff").darker().darker(), "OK")
 
-  val corpButtons: ArrayBuffer[CorpButton]
+  val corpButtons: ArrayBuffer[CorpButton] = corpChoices.map(corp => new CorpButton(engine, corp)).to[ArrayBuffer]
   val checkoutCorpButtons: ArrayBuffer[CorpButton] = ArrayBuffer()
 
   private def corpButtonPosition(num: Int) = (x + 23 + 50*num, y + 80)
@@ -32,6 +37,9 @@ abstract class CorpPrompt(engine: Engine, val message: String) extends Actor {
       val pos = corpButtonPosition(i)
       world.addActor(corpButtons(i), pos._1, pos._2)
     })
+    for (button <- corpButtons) {
+      button.registerClickHandler((Unit) => addCheckoutCorpButton(button.corp))
+    }
   }
 
   override def removedFromWorld(world: World): Unit = {
@@ -41,6 +49,24 @@ abstract class CorpPrompt(engine: Engine, val message: String) extends Actor {
   }
 
   protected def addCheckoutCorpButton(corp: Int): Unit = {
+    // TODO: cleanup
+    if (!canCheckoutCorp(corp, selectedCorps)) {
+      if (queueLike) {
+        val truncatedCheckoutCorps = checkoutCorpButtons - checkoutCorpButtons.head
+        val truncatedMap =
+          for ((group, list) <- truncatedCheckoutCorps.map(_.corp).groupBy(i => i)) yield (group, list.length)
+        if (canCheckoutCorp(corp, truncatedMap)) {
+          if (worldOpt.isDefined)
+            worldOpt.get.removeActor(checkoutCorpButtons.head)
+          checkoutCorpButtons -= checkoutCorpButtons.head
+        } else {
+          return
+        }
+      } else {
+        return
+      }
+    }
+
     val newButton: CorpButton = new CorpButton(engine, corp)
     checkoutCorpButtons += newButton
     val pos = checkoutCorpButtonPosition(checkoutCorpButtons.length - 1)
