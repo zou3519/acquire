@@ -26,7 +26,7 @@ class History(val engine: Engine) extends Actor {
     if (currentNumMoves != engine.numMoves) {
       val flatList: java.util.List[String] =
         JavaConverters.seqAsJavaListConverter(engine.flatHistory.map(
-          moveRecord => EngineDefaults.moveRecordToString(moveRecord))).asJava
+          moveRecord => EngineDefaults.describeMoveRecord(moveRecord))).asJava
       list.setItems(FXCollections.observableList[String](flatList))
       currentNumMoves = engine.numMoves
       list.scrollTo(currentNumMoves - 1) // TODO: there might be a bug here

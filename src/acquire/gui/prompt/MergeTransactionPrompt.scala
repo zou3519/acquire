@@ -5,19 +5,29 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 
-import acquire.engine.{EngineDefaults, Engine}
-import acquire.gui.{Default, Button}
+import acquire.engine.Engine
+import acquire.gui.Button
 import acquire.gui.theatre.{Actor, World}
 
 class MergeTransactionPrompt(engine: Engine) extends Actor {
   _height = 284
   _width = 388
 
-  val message = "Currently merging " + EngineDefaults.corpName(engine.state.preyCorp.get) +
-    " into " + EngineDefaults.corpName(engine.state.predatorCorp.get)
-//  + "\n"
-//    "Player " + engine.state.currentPlayer + ", choose what to do with your shares of " +
-//      EngineDefaults.corpName(engine.state.preyCorp.get)
+  val message = {
+    val preyCorp = engine.state.preyCorp.get
+    val predatorCorp = engine.state.predatorCorp.get
+    val preyName: String = engine.config.corpName(preyCorp)
+    val predatorName: String = engine.config.corpName(predatorCorp)
+    val preyPrice: Int = engine.state.sheet.sharePrice(preyCorp).get
+    val predatorPrice: Int = engine.state.sheet.sharePrice(predatorCorp).get
+
+    Vector(
+      f"$preyName will be merged into $predatorName",
+      f"Please select how many shares of ",
+      f"$preyName ($$$preyPrice%d/ea) you would like to keep,",
+      f"sell, or trade 2:1 for shares of $predatorName ($$$predatorPrice%d/ea)"
+    )
+  }
 
   val submitButton: Button = new Button(50, 50, Color.web("0093ff"), Color.web("0093ff").darker().darker(), "OK")
   val sell: NumberInput = new NumberInput()
@@ -90,7 +100,9 @@ class MergeTransactionPrompt(engine: Engine) extends Actor {
     gc.setFill(Color.web("aaaaaa"))
     gc.setTextAlign(TextAlignment.CENTER)
     gc.setTextBaseline(VPos.CENTER)
-    gc.fillText(message, x + _width/2, y + 20)
+    for (index <- message.indices) {
+      gc.fillText(message(index),  x + _width/2, y + 20 + 20*index)
+    }
 
     gc.fillText("keep", x+60, y + 130)
     gc.fillText("sell", x+160 + 45/2, y + 130)

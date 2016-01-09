@@ -30,10 +30,10 @@ class World {
   }
 
   /**
-    * Update has to be defended against actors removing their siblings.
+    * updateActors() has to be defended against actors removing their siblings.
     * We create a copy of the list then update everyone as necessary.
     */
-  def update(): Unit = {
+  def updateActors(): Unit = {
     val actorsIterator = actors.clone.toIterator
     while (actorsIterator.hasNext) {
       val actor = actorsIterator.next()
@@ -41,6 +41,6 @@ class World {
     }
   }
 
-  def draw(gc: GraphicsContext): Unit =
+  def drawActors(gc: GraphicsContext): Unit =
     actors.foreach(_.draw(gc))
 }

@@ -6,6 +6,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.{TextAlignment, FontWeight, Font}
 
 import acquire.engine.{PlayerType, Engine}
+import acquire.gui.ClickableActor
 import acquire.state._
 
 class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableActor {

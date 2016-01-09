@@ -5,6 +5,9 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.{FontWeight, Font, TextAlignment}
 
+import acquire.gui.ClickableActor
+
+
 class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,
                       textString: String) extends ClickableActor {
   _width = width

@@ -71,8 +71,8 @@ public class Main extends Application {
                 gc.setFill(Color.web("707070"));
                 gc.fillText(Default.VersionString(), 650, 20);
 
-                world.update();
-                world.draw(gc);
+                world.updateActors();
+                world.drawActors(gc);
             }
         }.start();
 
