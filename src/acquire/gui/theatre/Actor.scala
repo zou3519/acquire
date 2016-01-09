@@ -3,8 +3,6 @@ package acquire.gui.theatre
 import javafx.geometry.Rectangle2D
 import javafx.scene.canvas.GraphicsContext
 
-import acquire.gui.theatre.World
-
 /**
   * An actor is something that is drawable on a canvas
   */
@@ -13,6 +11,7 @@ trait Actor {
   private[theatre] var _x: Double = 0
   private[theatre] var _y: Double = 0
 
+  // todo: eventually abstract these away
   protected var _width: Double = 0
   protected var _height: Double = 0
 

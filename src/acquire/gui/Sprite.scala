@@ -24,7 +24,7 @@ class Sprite extends Actor {
   }
 
   override def draw(gc: GraphicsContext) {
-    gc.drawImage(_image, _x, _y)
+    gc.drawImage(_image, x, y)
   }
 
   override def update(): Unit = ()

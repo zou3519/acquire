@@ -56,37 +56,37 @@ class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableAct
         } else {
           gc.setFill(tileColor.darker())
         }
-        gc.fillRoundRect(_x+1, _y+1, size, size, 6, 6)
+        gc.fillRoundRect(x+1, y+1, size, size, 6, 6)
       }
 
       val stroke = 2.0
       gc.setLineWidth(stroke)
       if (_highlighted) gc.setStroke(tileColor.brighter())
       else gc.setStroke(tileColor)
-      gc.strokeRoundRect(_x+1+stroke/4, _y+1+stroke/4, size-stroke/2, size-stroke/2, stroke, stroke)
+      gc.strokeRoundRect(x+1+stroke/4, y+1+stroke/4, size-stroke/2, size-stroke/2, stroke, stroke)
 
       gc.setFont(font)
       gc.setTextAlign(TextAlignment.CENTER)
       gc.setTextBaseline(VPos.CENTER)
       if (_highlighted) gc.setFill(tileColor.brighter())
       else gc.setFill(tileColor)
-      gc.fillText(loc, _x + _width/2, _y + _height/2)
+      gc.fillText(loc, x + _width/2, y + _height/2)
     } else {
       gc.setFill(tileColor)
-      gc.fillRoundRect(_x+1, _y+1, size, size, 6, 6)
+      gc.fillRoundRect(x+1, y+1, size, size, 6, 6)
 
       gc.setFont(font)
       gc.setTextAlign(TextAlignment.CENTER)
       gc.setTextBaseline(VPos.CENTER)
       gc.setFill(Color.web("707070"))
-      gc.fillText(corpName, _x+ _width/2, _y + _height/2)
+      gc.fillText(corpName, x+ _width/2, y + _height/2)
 
 //      if (corpName != "") {
 //        gc.setFont(font)
 //        gc.setTextAlign(TextAlignment.CENTER)
 //        gc.setTextBaseline(VPos.CENTER)
 //        gc.setFill(tileColor.darker().darker())
-//        gc.fillText(corpName.charAt(0).toString, _x + _width/2, _y + _height/2)
+//        gc.fillText(corpName.charAt(0).toString, x + _width/2, y + _height/2)
 //      }
     }
   }

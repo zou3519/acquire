@@ -23,11 +23,11 @@ abstract class CorpPrompt(engine: Engine, val message: String) extends Actor {
   val corpButtons: ArrayBuffer[CorpButton]
   val checkoutCorpButtons: ArrayBuffer[CorpButton] = ArrayBuffer()
 
-  private def corpButtonPosition(num: Int) = (_x + 23 + 50*num, _y + 80)
-  private def checkoutCorpButtonPosition(num: Int) = (_x + 23 + 50*num, _y + 150)
+  private def corpButtonPosition(num: Int) = (x + 23 + 50*num, y + 80)
+  private def checkoutCorpButtonPosition(num: Int) = (x + 23 + 50*num, y + 150)
 
   override def addedToWorld(world: World): Unit = {
-    world.addActor(submitButton, _x+330, _y+(284-58))
+    world.addActor(submitButton, x+330, y+(284-58))
     corpButtons.indices.foreach(i => {
       val pos = corpButtonPosition(i)
       world.addActor(corpButtons(i), pos._1, pos._2)
@@ -60,7 +60,7 @@ abstract class CorpPrompt(engine: Engine, val message: String) extends Actor {
   override def setPosition(x: Double, y: Double): Unit = {
     super.setPosition(x,y)
     if (worldOpt.isDefined) {
-      submitButton.setPosition(_x + 330, _y + (284 - 58))
+      submitButton.setPosition(x + 330, y + (284 - 58))
       corpButtons.indices.foreach(i => {
         val pos = corpButtonPosition(i)
         corpButtons(i).setPosition(pos._1, pos._2)
@@ -82,30 +82,30 @@ abstract class CorpPrompt(engine: Engine, val message: String) extends Actor {
     checkoutCorpButtons.foreach(button => if (currentLength == checkoutCorpButtons.length) button.update())
 
     if (currentLength != checkoutCorpButtons.length) {
-      setPosition(_x, _y) // refresh the position of the buttons.
+      setPosition(x, y) // refresh the position of the buttons.
     }
   }
 
   override def draw(gc: GraphicsContext): Unit = {
     // background fill
     gc.setFill(Color.web("3a3a3a"))
-    gc.fillRect(_x, _y, _width, _height)
+    gc.fillRect(x, y, _width, _height)
 
     // checkout box fill
     gc.setFill(Color.web("404040"))
-    gc.fillRect(_x + 10, _y + 140, _width - 20, 60)
+    gc.fillRect(x + 10, y + 140, _width - 20, 60)
 
     // outline for prompt and checkout box
     gc.setStroke(Color.web("0093ff"))
     gc.setLineWidth(1)
-    gc.strokeRect(_x, _y, _width, _height)
-    gc.strokeRect(_x + 10, _y + 140, _width - 20, 60)
+    gc.strokeRect(x, y, _width, _height)
+    gc.strokeRect(x + 10, y + 140, _width - 20, 60)
 
     // text message
     gc.setFill(Color.web("aaaaaa"))
     gc.setTextAlign(TextAlignment.CENTER)
     gc.setTextBaseline(VPos.CENTER)
-    gc.fillText(message, _x + _width/2, _y + 20)
+    gc.fillText(message, x + _width/2, y + 20)
 
     submitButton.draw(gc)
     corpButtons.foreach(_.draw(gc))

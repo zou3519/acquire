@@ -48,9 +48,9 @@ class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,
   override def draw(gc: GraphicsContext): Unit = {
     super.draw(gc)
     (MouseUtil.mouseOver(this), MouseUtil.isMousePressed) match {
-      case (true, true) => drawOnMouseDown(gc, _x, _y)
-      case (true, false) => drawOnHover(gc, _x, _y)
-      case _ => drawRegular(gc, _x, _y)
+      case (true, true) => drawOnMouseDown(gc, x, y)
+      case (true, false) => drawOnHover(gc, x, y)
+      case _ => drawRegular(gc, x, y)
     }
   }
 }
