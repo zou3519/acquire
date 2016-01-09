@@ -1,7 +1,7 @@
 package acquire.gui
 
 import acquire.engine.{PlayerType, Engine}
-import acquire.gui.prompt.CorpPrompt
+import acquire.gui.prompt.{MergeTransactionPrompt, CorpPrompt}
 import acquire.gui.theatre.Actor
 import acquire.state._
 
@@ -133,6 +133,19 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
     })
   }
 
+  private def setupHumanMergeTransaction() = {
+    val prompt: MergeTransactionPrompt = new MergeTransactionPrompt(engine)
+    worldOpt.get.addActor(prompt, 624, 470)
+    prompt.submitButton.registerClickHandler((Unit) => {
+      val amounts = prompt.getAmounts
+      val move = MergeTransaction(engine.state.currentPlayer,
+        engine.state.preyCorp.get, engine.state.predatorCorp.get, amounts._2, amounts._3)
+      engine.makeMove(move)
+      worldOpt.get.removeActor(prompt)
+      hasSetupHumanMove = false
+    })
+  }
+
   private def setupHumanFoundCorp() = {
     val prompt: CorpPrompt = createFoundCorpPrompt
     worldOpt.get.addActor(prompt, 624, 470)
@@ -157,7 +170,7 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
       case MoveType.PlaceTileT => setupHumanPlaceTile()
       case MoveType.FoundCorpT => setupHumanFoundCorp()
       case MoveType.MergeCorpT => setupHumanMergeCorp1()
-      case MoveType.MergeTransactionT => aiMove(); hasSetupHumanMove = false
+      case MoveType.MergeTransactionT => setupHumanMergeTransaction()
       case MoveType.BuySharesT => setupHumanBuyShares()
     }
   }
