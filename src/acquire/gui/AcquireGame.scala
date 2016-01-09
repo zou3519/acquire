@@ -53,7 +53,7 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
 
   private def aiMove(): Unit = {
     // ai's make moves at 1 per second
-    if (count % 30 == 0) {
+    if (count % 1 == 0) {
       engine.makeMove(engine.state.randomMove.get)
       println(engine.state.prettyPrint)
     }

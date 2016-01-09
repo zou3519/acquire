@@ -26,7 +26,13 @@ class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableAct
     empty = tile.isInstanceOf[EmptyTile]
     tileColor = Colors.colorOf(tile)
     tile match {
-      case CorpTile(id) => corpName = engine.state.config.corpName(id)
+      case CorpTile(id) => {
+        val corpHQ = engine.corpHQ(id)
+        if (corpHQ.nonEmpty)
+          if (corpHQ.get.row == row && corpHQ.get.col == col)
+            corpName = new String(engine.state.config.corpName(id).toCharArray.take(2))
+          else corpName = ""
+      }
       case _ => ()
     }
   }
@@ -68,6 +74,12 @@ class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableAct
     } else {
       gc.setFill(tileColor)
       gc.fillRoundRect(_x+1, _y+1, size, size, 6, 6)
+
+      gc.setFont(font)
+      gc.setTextAlign(TextAlignment.CENTER)
+      gc.setTextBaseline(VPos.CENTER)
+      gc.setFill(Color.web("707070"))
+      gc.fillText(corpName, _x+ _width/2, _y + _height/2)
 
 //      if (corpName != "") {
 //        gc.setFont(font)
