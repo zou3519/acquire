@@ -5,15 +5,20 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 
-import acquire.engine.Engine
-import acquire.gui.Button
+import acquire.engine.{EngineDefaults, Engine}
+import acquire.gui.{Default, Button}
 import acquire.gui.theatre.{Actor, World}
 
 class MergeTransactionPrompt(engine: Engine) extends Actor {
   _height = 284
   _width = 388
 
-  val message = "merge transaction"
+  val message = "Currently merging " + EngineDefaults.corpName(engine.state.preyCorp.get) +
+    " into " + EngineDefaults.corpName(engine.state.predatorCorp.get)
+//  + "\n"
+//    "Player " + engine.state.currentPlayer + ", choose what to do with your shares of " +
+//      EngineDefaults.corpName(engine.state.preyCorp.get)
+
   val submitButton: Button = new Button(50, 50, Color.web("0093ff"), Color.web("0093ff").darker().darker(), "OK")
   val sell: NumberInput = new NumberInput()
   val trade: NumberInput = new NumberInput()

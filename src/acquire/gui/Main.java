@@ -11,7 +11,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class Example extends Application {
+public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
