@@ -7,6 +7,7 @@ object EngineDefaults {
   val Corps = Seq("Tower", "Luxor", "American", "Worldwide", "Festival", "Imperial", "Continental").zip(
     Seq(200, 200, 300, 300, 300, 400, 400))
 
+  // TODO: break into functions
   def describeMoveRecord(moveRecord: MoveRecord): String = moveRecord match {
     case MoveRecord(state, move) => {
       val player: String = state.config.playerName(move.playerId)
@@ -66,7 +67,15 @@ object EngineDefaults {
             f"for $newShares%d share(s) of $predator%s"
 
         case BuyShares(_, sharesMap) =>
-          if (sharesMap.isEmpty) f"$player%s bought no shares"
+          if (sharesMap.isEmpty) {
+            if (state.config.corps.forall(corp => !state.sheet.hasChain(corp) || state.sheet.chainSize(corp).get == 0)) {
+              f"$player%s could not buy shares: no available shares"
+            } else if (state.legalMoves.length == 1) {
+              f"$player%s could not afford any shares"
+            } else {
+              f"$player%s bought no shares"
+            }
+          }
           else f"$player%s bought " + sharesMap.map {
             case (corpId, amt) =>
               val corp = state.config.corpName(corpId)
@@ -117,5 +126,11 @@ class Engine(players: IndexedSeq[(String, PlayerType)]) {
     // prepare for the next move
     _state = nextState
     _numMoves += 1
+
+    // if there's only one option make the option
+    val legalMoves = state.legalMoves
+    if (legalMoves.length == 1 && state.expectedMoveType != MoveType.PlaceTileT) {
+      makeMove(legalMoves.head)
+    }
   }
 }
