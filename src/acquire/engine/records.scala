@@ -18,4 +18,6 @@ case class TurnRecord(records: IndexedSeq[MoveRecord]) extends Record {
   * @param state the state at which the move was made
   * @param move the move someone made at this state
   */
-case class MoveRecord(state: AcquireState, move: Move) extends Record
+case class MoveRecord(state: AcquireState, move: Move) extends Record {
+  val description = EngineDefaults.describeMoveRecord(this)
+}

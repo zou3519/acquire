@@ -7,24 +7,79 @@ object EngineDefaults {
   val Corps = Seq("Tower", "Luxor", "American", "Worldwide", "Festival", "Imperial", "Continental").zip(
     Seq(200, 200, 300, 300, 300, 400, 400))
 
-  def moveToString(move: Move) = move match {
-    case EndTurn(player, endGame) =>
-      val nextPlayer = (player + 1)%4
-      if (endGame) f"player $player%d ended the game." else f"--------------- player $nextPlayer%d's turn ---------------"
-    case PlaceTile(player, loc) => f"player $player%d placed tile $loc%s"
-    case FoundCorp(player, corp) => f"player $player%d founded corp $corp%d"
-    case MergeCorp(player, preyCorp, predatorCorp) => f"player $player%d merged corp $preyCorp%d into corp $predatorCorp%d"
-    case MergeTransaction(player, preyCorp, predatorCorp, sell, trade) => f"player $player%d sold $sell%d and traded $trade%d shares of $preyCorp%d"
-    case BuyShares(player, corpToNum) =>
-      if (corpToNum.isEmpty) f"player $player%d bought no shares"
-      else f"player $player%d bought " + corpToNum.map {
-        case (corp, amt) => amt.toString + " shares of corp " + corp.toString
-      }.mkString(" and ")
+  def describeMoveRecord(moveRecord: MoveRecord): String = moveRecord match {
+    case MoveRecord(state, move) => {
+      val player: String = state.config.playerName(move.playerId)
+      move match {
+        case EndTurn(playerId, endGame) =>
+          val nextPlayer = state.config.playerName((playerId + 1)%4) // TODO: remove hardcoding
+          if (endGame) {
+            val corpBonusMessages: Seq[Seq[String]] = for {
+              corpId <- state.config.corps
+              if state.sheet.hasChain(corpId)
+            } yield {
+              val topShareholders = state.topShareholders(corpId)
+              val bonuses = state.bonuses(corpId)
+              val corp = state.config.corpName(corpId)
+              val bonusMessages: Seq[String] =
+                (for ((holdingGroup, holders) <- topShareholders; holderId <- holders) yield {
+                  val holder = state.config.playerName(holderId)
+                  val bonus = bonuses(holderId)
+                  f"$holder%s ($holdingGroup%s holder of $corp%s) received $$$bonus%d"
+                }).toSeq
+              bonusMessages
+            }
+
+            f"$player%s ended the game.\n" + corpBonusMessages.flatten.mkString("\n")
+          }
+          else f"--------------- $nextPlayer%s's turn ---------------"
+
+        case PlaceTile(_, location) =>
+          f"$player%s placed tile $location%s"
+
+        case FoundCorp(_, corpId) =>
+          val corp: String = state.config.corpName(corpId)
+          val giftShareMessage: String = if (state.sheet.bankShares(corpId) > 0) " and received 1 share." else ""
+          f"$player%s founded $corp%s$giftShareMessage%s"
+
+        case MergeCorp(_, preyCorpId, predatorCorpId) =>
+          val preyCorp = state.config.corpName(preyCorpId)
+          val predatorCorp = state.config.corpName(predatorCorpId)
+          val topShareholders = state.topShareholders(preyCorpId)
+          val bonuses = state.bonuses(preyCorpId)
+          val mergeMessages: Seq[String] =
+            (for ((holdingGroup, holders) <- topShareholders; holderId <- holders) yield {
+              val holder = state.config.playerName(holderId)
+              val bonus = bonuses(holderId)
+              f"$holder%s ($holdingGroup%s) received $$$bonus%d"
+            }).toSeq
+
+          f"$player%s is merging $preyCorp%s into $predatorCorp%s\n" +
+            f"Shareholder bonuses for $preyCorp will be paid out.\n" +
+            mergeMessages.mkString("\n")
+
+        case MergeTransaction(_, preyCorpId, predatorCorpId, sellAmt, tradeAmt) =>
+          val prey = state.config.corpName(preyCorpId)
+          val predator = state.config.corpName(predatorCorpId)
+          val newShares = tradeAmt/2
+          f"$player%s sold $sellAmt%d share(s) of $prey%s and traded $tradeAmt%d share(s) of $prey%s " +
+            f"for $newShares%d share(s) of $predator%s"
+
+        case BuyShares(_, sharesMap) =>
+          if (sharesMap.isEmpty) f"$player%s bought no shares"
+          else f"$player%s bought " + sharesMap.map {
+            case (corpId, amt) =>
+              val corp = state.config.corpName(corpId)
+              f"$amt%d share(s) of $corp"
+          }.mkString(" and ")
+      }
+    }
   }
 }
 
 class Engine(players: IndexedSeq[(String, PlayerType)]) {
-  private var _state: AcquireState = new AcquireState(new Config(players.map(_._1), EngineDefaults.Corps))
+  val config: Config = new Config(players.map(_._1), EngineDefaults.Corps)
+  private var _state: AcquireState = new AcquireState(config)
 
   private var _numMoves: Int = 0                              // # moves people have made
   private var _history: IndexedSeq[TurnRecord] = Vector()     // list of (state, move chosen from this state)
@@ -42,6 +97,7 @@ class Engine(players: IndexedSeq[(String, PlayerType)]) {
 
   def makeMove(move: Move): Unit = {
     // TODO: check to see if the move is legal ?
+    println("Attempting to move: " + EngineDefaults.describeMoveRecord(MoveRecord(state, move)))
     val nextState = _state.nextState(move)
 
     // update history
