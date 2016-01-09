@@ -125,7 +125,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
 
   def isLegalMove(move: Move): Boolean = {
     if (MoveType.typeOf(move) != expectedMoveType) return false
-    if (move.player != currentPlayer) return false
+    if (move.playerId != currentPlayer) return false
 
     move match {
       case EndTurn(player, endTurn) => ???
@@ -139,11 +139,11 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
 
   private def isValidBuyShares(move: BuyShares): Boolean = {
     var totalPrice: Int = 0
-    for ((id, num) <- move.corpToNum) {
+    for ((id, num) <- move.sharesMap) {
       if (sheet.bankShares(id) < num || !sheet.hasChain(id)) return false
       totalPrice += sheet.sharePrice(id).get * num
     }
-    totalPrice <= sheet.cash(move.player)
+    totalPrice <= sheet.cash(move.playerId)
   }
 
   private def isValidBuySharesMap(sharesMap: Map[Int, Int]): Boolean = {
@@ -170,7 +170,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
 
   override def moveInPlace(move: Move): Unit = {
     require(_expectedMoveType == MoveType.typeOf(move), "has expected move type")
-    require(move.player == _currentPlayer, "correct player is playing")
+    require(move.playerId == _currentPlayer, "correct player is playing")
     move match {
       case EndTurn(player, endGame) => endTurn(player, endGame)
       case BuyShares(player, shareMap) => buyShares(player, shareMap)
@@ -287,7 +287,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   }
 
   /* maps for Majority and Minority shareholders only */
-  private def topShareholders(corp: Int): Map[Shareholder, Seq[Int]] = {
+  def topShareholders(corp: Int): Map[Shareholder, Seq[Int]] = {
     val playersWithShares = config.players collect {
       case player if sheet.shares(corp, player) > 0 => (player, sheet.shares(corp, player))
     }
@@ -309,7 +309,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   }
 
   // map players to their bonuses
-  private def bonuses(corp: Int): Map[Int, Int] = {
+  def bonuses(corp: Int): Map[Int, Int] = {
     require(sheet.hasChain(corp), "corp must be formed")
 
     val holderInfo: Map[Shareholder, Seq[Int]] = topShareholders(corp)
