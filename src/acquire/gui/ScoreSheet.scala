@@ -37,10 +37,6 @@ class ScoreSheet(engine: Engine) extends Actor {
   val cellWidth = 34
   val cellHeight = 28
 
-//  val rows = Array(
-//    Array("size", "0", "0", "0", "0", "0", "0", "0"),
-//    Array("price", "-", "-", "-", "-", "-", "-", "-")
-//  )
   override def draw(gc: GraphicsContext): Unit = {
     val corps = Vector("◄ Tower", "◄ Luxor", "◄ American", "◄ Worldwide", "◄ Festival", "◄ Imperial", "◄ Continental", "cash/100", "net worth/100")
 

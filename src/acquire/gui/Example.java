@@ -51,9 +51,6 @@ public class Example extends Application {
 
 
         Engine engine = Default.newEngine();
-        for (int i = 0; i < 150; i++) {
-            engine.makeMove(engine.state().randomMove().get());
-        }
 
         List<Actor> actors = new ArrayList<>();
         Board board = new Board(engine);
@@ -65,9 +62,16 @@ public class Example extends Application {
         history.setPosition(10, 470);
         history.addToGroup(root);
 
+        AcquireGame game = new AcquireGame(engine, board, sheet);
+
+        CorpPrompt prompt = new CorpPrompt(engine, "Pick which corp survives");
+        prompt.setPosition(624, 470);
+
+        actors.add(prompt);
         actors.add(sheet);
         actors.add(board);
         actors.add(history);
+        actors.add(game);
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
@@ -75,6 +79,8 @@ public class Example extends Application {
                 gc.clearRect(0, 0, 1024, 768);
                 gc.setFill(new Color(0.2, 0.2, 0.2, 1));
                 gc.fillRect(0,0,canvas.getWidth(),canvas.getHeight());
+                gc.setFill(Color.web("707070"));
+                gc.fillText(Default.VersionString(), 650, 20);
 
                 for (Actor actor: actors) {
                     actor.update();

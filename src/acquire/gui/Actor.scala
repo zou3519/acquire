@@ -3,7 +3,8 @@ package acquire.gui
 import javafx.geometry.Rectangle2D
 import javafx.scene.canvas.GraphicsContext
 
-import acquire.engine.Engine
+import acquire.engine.PlayerType.PlayerType
+import acquire.engine.{PlayerType, Engine}
 import acquire.state.{Config, AcquireState}
 
 /**
@@ -31,9 +32,14 @@ trait Actor {
 }
 
 object Default {
+  val VersionString = "0.1.0-α"
   private val corps = Seq("Tower", "Luxor", "American", "Worldwide", "Festival", "Imperial", "Continental").zip(
     Seq(200, 200, 300, 300, 300, 400, 400))
-  private val playerNames = Seq("p0.alpha", "p1.beta","p2.gamma","p3.delta")
-  def newState = new AcquireState(new Config(playerNames, corps))
+  private val playerNames: IndexedSeq[(String, PlayerType)] = Vector(
+    ("p0.alpha", PlayerType.Human),
+    ("p1.beta", PlayerType.Ai),
+    ("p2.gamma", PlayerType.Ai),
+    ("p3.delta", PlayerType.Ai))
+  def newState = new AcquireState(new Config(playerNames.map(_._1), corps))
   def newEngine = new Engine(playerNames)
 }

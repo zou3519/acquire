@@ -1,10 +1,11 @@
 package acquire.gui
 
+import javafx.application.Platform
 import javafx.collections.{ObservableList, FXCollections}
 import javafx.scene.Group
 import javafx.scene.control.ListView
 
-import acquire.engine.{EngineDefaults, Engine}
+import acquire.engine.{MoveRecord, EngineDefaults, Engine}
 
 import scala.collection.JavaConverters
 
@@ -15,6 +16,9 @@ class History(val engine: Engine) extends Actor {
   _height = 284
   list.setItems(items)
   list.setPrefSize(_width, _height)
+//  Platform.runLater( new Runnable{
+//    override def run(): Unit =
+//  })
 
   private val currentNumMoves = 0
 
@@ -27,6 +31,7 @@ class History(val engine: Engine) extends Actor {
         JavaConverters.seqAsJavaListConverter(engine.flatHistory.map(
           moveRecord => EngineDefaults.moveToString(moveRecord.move))).asJava
       list.setItems(FXCollections.observableList[String](flatList))
+//      list.scrollTo(list.getItems.size()-1) // TODO: debug
     }
   }
 
