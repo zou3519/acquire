@@ -52,26 +52,25 @@ public class Example extends Application {
 
         Engine engine = Default.newEngine();
 
-        List<Actor> actors = new ArrayList<>();
+        World world = new World();
+
+
         Board board = new Board(engine);
-        board.setPosition(10,10);
+        world.addActor(board, 10, 10);
+
         ScoreSheet sheet = new ScoreSheet(engine);
-        sheet.setPosition(684, 34);
+        world.addActor(sheet, 684, 34);
 
         History history = new History(engine);
-        history.setPosition(10, 470);
+        world.addActor(history, 10, 470);
         history.addToGroup(root);
 
         AcquireGame game = new AcquireGame(engine, board, sheet);
 
-        CorpPrompt prompt = new CorpPrompt(engine, "Pick which corp survives");
-        prompt.setPosition(624, 470);
 
-        actors.add(prompt);
-        actors.add(sheet);
-        actors.add(board);
-        actors.add(history);
-        actors.add(game);
+
+        world.addActor(game, 0, 0);
+
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
@@ -82,12 +81,8 @@ public class Example extends Application {
                 gc.setFill(Color.web("707070"));
                 gc.fillText(Default.VersionString(), 650, 20);
 
-                for (Actor actor: actors) {
-                    actor.update();
-                }
-                for (Actor actor : actors) {
-                    actor.draw(gc);
-                }
+                world.update();
+                world.draw(gc);
             }
         }.start();
 
