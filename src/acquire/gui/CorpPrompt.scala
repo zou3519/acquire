@@ -6,6 +6,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 
 import acquire.engine.Engine
+import acquire.gui.theatre.{World, Actor}
 
 import scala.collection.mutable.ArrayBuffer
 

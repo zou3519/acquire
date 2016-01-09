@@ -6,6 +6,7 @@ import javafx.scene.text.TextAlignment
 import javafx.scene.transform.Affine
 
 import acquire.engine.Engine
+import acquire.gui.theatre.Actor
 
 class ScoreSheet(engine: Engine) extends Actor {
 

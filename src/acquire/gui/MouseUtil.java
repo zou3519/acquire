@@ -1,5 +1,7 @@
 package acquire.gui;
 
+import acquire.gui.theatre.Actor;
+
 public class MouseUtil {
     static double mouseX;
     static double mouseY;

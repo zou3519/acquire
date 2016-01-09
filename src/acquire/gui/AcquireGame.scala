@@ -1,6 +1,7 @@
 package acquire.gui
 
 import acquire.engine.{PlayerType, Engine}
+import acquire.gui.theatre.Actor
 import acquire.state._
 
 /**

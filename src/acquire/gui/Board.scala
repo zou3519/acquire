@@ -3,6 +3,7 @@ package acquire.gui
 import javafx.scene.canvas.GraphicsContext
 
 import acquire.engine.Engine
+import acquire.gui.theatre.{World, Actor}
 
 class Board(val engine: Engine) extends Actor {
   val tiles: IndexedSeq[IndexedSeq[TilePiece]] = for (row <- 0 until 9)

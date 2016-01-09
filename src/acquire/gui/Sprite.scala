@@ -4,6 +4,8 @@ import javafx.geometry.Rectangle2D
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.image.Image
 
+import acquire.gui.theatre.Actor
+
 class Sprite extends Actor {
   private var _image: Image = null
 //  private var _x: Double = 0

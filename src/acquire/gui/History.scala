@@ -6,6 +6,7 @@ import javafx.scene.Group
 import javafx.scene.control.ListView
 
 import acquire.engine.{MoveRecord, EngineDefaults, Engine}
+import acquire.gui.theatre.Actor
 
 import scala.collection.JavaConverters
 

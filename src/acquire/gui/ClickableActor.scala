@@ -1,5 +1,7 @@
 package acquire.gui
 
+import acquire.gui.theatre.Actor
+
 trait ClickableActor extends Actor {
   protected var _clickHandler: (Unit) => Unit = (Unit) => ()
 
