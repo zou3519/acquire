@@ -11,6 +11,12 @@ import scala.collection.mutable.ArrayBuffer
 class World {
   val actors: ArrayBuffer[Actor] = ArrayBuffer()
 
+  /**
+    * Add an actor to this world.
+    * @param actor The actor to be added
+    * @param x The x-position to add the actor
+    * @param y The y-position to add the actor
+    */
   def addActor(actor: Actor, x: Double, y: Double): Unit = {
     require(!actors.contains(actor), "actor has already been added!")
     actors += actor
@@ -21,6 +27,10 @@ class World {
     actor.setPosition(x, y)
   }
 
+  /**
+    * Remove an actor from this world
+    * @param actor The actor to be removed
+    */
   def removeActor(actor: Actor): Unit = {
     require(actors.contains(actor), "no actor in world!")
     actor.removedFromWorld(this)
@@ -29,8 +39,7 @@ class World {
   }
 
   /**
-    * updateActors() has to be defended against actors removing their siblings.
-    * We create a copy of the list then update everyone as necessary.
+    * Call all of the actor's update functions.
     */
   def updateActors(): Unit = {
     val actorsIterator = actors.clone.toIterator
@@ -40,6 +49,10 @@ class World {
     }
   }
 
+  /**
+    * Draw the actors
+    * @param gc The GraphicsContext to draw the actors onto
+    */
   def drawActors(gc: GraphicsContext): Unit = {
     val actorsIterator = actors.clone.toIterator
     while (actorsIterator.hasNext) {
