@@ -4,6 +4,11 @@ import acquire.engine.{PlayerType, Engine}
 import acquire.gui.prompt.{MergeTransactionPrompt, CorpPrompt}
 import acquire.gui.theatre.Actor
 import acquire.state._
+import mcts.{UCT, TreeNode}
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 /**
   * AcquireGame is an actor! It can't be drawn, though
@@ -11,13 +16,22 @@ import acquire.state._
 class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) extends Actor {
   var count = 0
   private var hasSetupHumanMove = false
+  private var hasSetupAiMove = false
+  @volatile private var aiChosenMove: Option[Move] = None
 
   // game logic here
   override def update(): Unit = {
     if (!engine.state.isOver) {
       engine.currentPlayerType match {
         case PlayerType.Human => if (!hasSetupHumanMove) setupHumanMove()
-        case PlayerType.Ai => aiMove()
+        case PlayerType.Ai =>
+          if (!hasSetupAiMove) setupMctsAiMove() else {
+            if (aiChosenMove.isDefined) {
+              engine.makeMove(aiChosenMove.get)
+              aiChosenMove = None
+              hasSetupAiMove = false
+            }
+          }
       }
     }
   }
@@ -182,6 +196,28 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
       println(engine.state.prettyPrint)
     }
     count += 1
+  }
+
+  private def setupMctsAiMove(): Unit = {
+    require(!hasSetupAiMove)
+    hasSetupAiMove = true
+    getMctsAiMove.onComplete {
+      case Success(move) =>
+        aiChosenMove = Some(move)
+      case Failure(ex) =>
+        println(s"${ex.printStackTrace()}")
+    }
+  }
+
+  private def getMctsAiMove: Future[Move] = Future {
+    val currentNode = new TreeNode[Move](null, engine.state, null)
+    currentNode.legalMoves.length match {
+      case 1 =>
+        currentNode.legalMoves.head
+      case _ =>
+        val bestChild: TreeNode[Move] = UCT.UCTSearch(currentNode, 5000, 5000)
+        bestChild.move
+    }
   }
 
 }

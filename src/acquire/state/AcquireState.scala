@@ -53,21 +53,43 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     if (canEndGame) Vector(false, true).map(b => EndTurn(currentPlayer, b))
     else Vector(EndTurn(currentPlayer, endGame = false))
 
-  // there can be a lot of these
-  private def legalBuySharesMoves: Iterator[BuyShares] = {
-    val shares: Seq[Option[Int]] = config.corps.filter(sheet.hasChain) flatMap {
-      corp => {
-        val maxPurchase: Int = math.min(3, sheet.cash(currentPlayer) / sheet.sharePrice(corp).get)
-        Vector().padTo(math.min(maxPurchase, sheet.chainSize(corp).get), Some(corp))
-      }
-    }
-    val sharesWithNones: Seq[Option[Int]] = shares ++ Seq(None, None, None)
-    val combos: Iterator[Seq[Option[Int]]] = sharesWithNones.combinations(3)
-    val allShareMaps: Iterator[Map[Int, Int]] = combos.map(combo => combo.groupBy(identity) collect {
-      case (Some(num), lst) => (num, lst.size)
-    })
-    allShareMaps collect {
-      case shareMap if isValidBuySharesMap(shareMap) => BuyShares(currentPlayer, shareMap)
+//  // there can be a lot of these
+//  private def legalBuySharesMoves: IndexedSeq[BuyShares] = {
+//    val shares: Seq[Option[Int]] = config.corps.filter(sheet.hasChain) flatMap {
+//      corp => {
+//        val maxPurchase: Int = math.min(3, sheet.cash(currentPlayer) / sheet.sharePrice(corp).get)
+//        Vector().padTo(math.min(maxPurchase, sheet.chainSize(corp).get), Some(corp))
+//      }
+//    }
+//    val sharesWithNones: Seq[Option[Int]] = shares ++ Seq(None, None, None)
+//    val combos: Iterator[Seq[Option[Int]]] = sharesWithNones.combinations(3)
+//    val allShareMaps: Iterator[Map[Int, Int]] = combos.map(combo => combo.groupBy(identity) collect {
+//      case (Some(num), lst) => (num, lst.size)
+//    })
+//    allShareMaps collect {
+//      case shareMap if isValidBuySharesMap(shareMap) => BuyShares(currentPlayer, shareMap)
+//    } toIndexedSeq
+//  }
+
+  private def combinations(lst: Seq[Int]): IndexedSeq[Seq[Int]] =
+    Combo.combinations(lst.toArray, 3).map(_.toSeq).toIndexedSeq
+    //lst.combinations(3).toIndexedSeq
+
+  private def legalBuySharesMoves: IndexedSeq[BuyShares] = {
+    def bank(corp: Int) = sheet.bankShares(corp)
+    val price: Array[Int] = config.corps.map(corp => sheet.sharePrice(corp).getOrElse(0)).toArray
+    val cash = sheet.cash(currentPlayer)
+
+    val options: Seq[Int] = config.corps.filter(c => sheet.hasChain(c) && bank(c) >= 1 && price(c) <= cash) ++ Seq(7,8,9)
+    combinations(options) collect {
+      case Seq(7, 8, 9)                                                           => BuyShares(currentPlayer, Map[Int, Int]())
+      case Seq(a, 7, 8) if bank(a) >= 3 && 3*price(a) <= cash                     => BuyShares(currentPlayer, Map(a -> 3))
+      case Seq(a, 8, 9) if a < 7 && bank(a) >= 2 && 2*price(a) <= cash            => BuyShares(currentPlayer, Map(a -> 2))
+      case Seq(a, 7, 9) if a < 7 && price(a) <= cash                              => BuyShares(currentPlayer, Map(a -> 1))
+      case Seq(a, b, 7) if bank(b) >= 2 && price(a) + 2*price(b) <= cash          => BuyShares(currentPlayer, Map(a -> 1, b -> 2))
+      case Seq(a, b, 8) if b < 7 && bank(a) >= 2 && 2*price(a) + price(b) <= cash => BuyShares(currentPlayer, Map(a -> 2, b -> 1))
+      case Seq(a, b, 9) if b < 7 && price(a) + price(b) <= cash                   => BuyShares(currentPlayer, Map(a -> 1, b -> 1))
+      case Seq(a, b, c) if c < 7 && price(a) + price(b) + price(c) <= cash        => BuyShares(currentPlayer, Map(a -> 1, b -> 1, c -> 1))
     }
   }
 
@@ -77,7 +99,9 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     } toIndexedSeq
 
   private def legalPlaceTileMoves: IndexedSeq[PlaceTile] =
-    tileRack(currentPlayer).toIndexedSeq.filter(canPlaceTile).map(tile => PlaceTile(currentPlayer, tile))
+    tileRack(currentPlayer) collect {
+      case tile if canPlaceTile(tile) => PlaceTile(currentPlayer, tile)
+    } toIndexedSeq
 
   private def legalMergeCorpMoves: IndexedSeq[MergeCorp] = {
     val sizeOfN1Corps = _n1CorpsForMerge.map(_.size)
@@ -115,7 +139,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     if (isOver) Vector() else
     _expectedMoveType match {
       case MoveType.EndTurnT => legalEndTurnMoves
-      case MoveType.BuySharesT => legalBuySharesMoves toIndexedSeq
+      case MoveType.BuySharesT => legalBuySharesMoves
       case MoveType.FoundCorpT => legalFoundCorpMoves
       case MoveType.PlaceTileT => legalPlaceTileMoves
       case MoveType.MergeCorpT => legalMergeCorpMoves
@@ -194,6 +218,54 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
       newState._n1CorpsForMerge  = _n1CorpsForMerge
       newState._n2CorpsForMerge  = _n2CorpsForMerge
     }
+    newState
+  }
+
+  def copyForPlayer(currentPlayer: Int): AcquireState = {
+    val boardCopy = board.copy
+    val tileRackCopy = _tileRack.map(_.clone)
+    val newState = new AcquireState(config, tileRackCopy, boardCopy, sheet.copy)
+    newState._whoseTurn        = _whoseTurn
+    newState._currentPlayer    = _currentPlayer
+    newState._expectedMoveType = _expectedMoveType
+    newState._tilePlaced       = _tilePlaced
+    newState._mergerOccurring  = _mergerOccurring
+    if (_mergerOccurring) {
+      newState._predatorCorp     = _predatorCorp
+      newState._preyCorp         = _preyCorp
+      newState._n1CorpsForMerge  = _n1CorpsForMerge
+      newState._n2CorpsForMerge  = _n2CorpsForMerge
+    }
+    // now, shuffle everyone else's tiles
+
+    // maps player id => tiles
+    val numTiles: Map[Int, Int] = (config.players zip tileRackCopy.map(_.size)) toMap
+    val playersToShuffle: Seq[Int] = config.players.filter(_ != currentPlayer)
+
+    // put all the tiles back into the board
+    for (player <- playersToShuffle) {
+      val playerTiles = tileRackCopy(player)
+      while (playerTiles.nonEmpty) {
+        boardCopy.tiles += playerTiles.head
+        playerTiles -= playerTiles.head
+      }
+    }
+
+    boardCopy.shuffleTiles()
+
+    // put the same number of tiles back
+    for (player <- playersToShuffle; i <- 0 until numTiles(player)) {
+      tileRackCopy(player) += boardCopy.tiles.dequeue()
+    }
+
+    // check things
+    for (player <- config.players) {
+      assert(_tileRack(player).size == tileRackCopy(player).size, f"player $player%d has same number of tiles")
+    }
+    tileRack(currentPlayer).foreach(tile =>
+      assert(tileRackCopy(currentPlayer).contains(tile), f"player $currentPlayer%d's rack has tile $tile%s"))
+    assert(board.tiles.length == boardCopy.tiles.length, f"board has same number of tiles")
+
     newState
   }
 
@@ -529,7 +601,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   }
 
   /* ------------------------- PRINTING ------------------------------ */
-  private def prettyPrintStats() = {
+  def prettyPrintStats() = {
     val rows = Vector.concat(config.players.map(config.playerName).toVector, Vector("sz", "bank","cost","lg$", "sm$" ))
     val cols = Vector.concat(config.corps.map(config.corpName).map(_.charAt(0).toString).toVector, Vector("$$", "net"))
 
@@ -575,13 +647,14 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   private def prettyPrintTileRack = {
     _tileRack.map(_.toString).mkString(" | ")
   }
-  private def prettyPrintInfo = {
+
+  def prettyPrintInfo = {
     val somelst = List(_whoseTurn, _currentPlayer, _expectedMoveType, _tilePlaced,
       _mergerOccurring, _predatorCorp, _preyCorp, _n1CorpsForMerge, _n2CorpsForMerge)
     somelst.map(_.toString).mkString(", ")
   }
 
-  private def prettyPrintBoard() = {
+  def prettyPrintBoard() = {
     def rowView(row: Int): Seq[String] = row match {
       case 9 => for (r <- 0 to board.Cols) yield if (r == 0) "" else r.toString
       case _ =>

@@ -1,5 +1,6 @@
 package acquire.engine
 
+import scala.concurrent.Future
 import acquire.engine.PlayerType.PlayerType
 import acquire.state._
 
