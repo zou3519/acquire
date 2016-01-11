@@ -43,32 +43,22 @@ class CorpPrompt(engine: Engine, val message: String, val corpChoices: Seq[Int],
     for ((group, list) <- checkoutCorpButtons.map(_.corp).groupBy(i => i)) yield (group, list.length)
 
   protected def addCheckoutCorpButton(corp: Int): Unit = {
-    // TODO: cleanup
-    if (!canCheckoutCorp(corp, selectedCorps)) {
-      if (queueLike) {
+    canCheckoutCorp(corp, selectedCorps) match {
+      // draw the button
+      case true => addNewCheckoutButton(corp)
+
+      case false if queueLike => // check to see if we're queuelike; if we are, then replace buttons
         val truncatedCheckoutCorps = checkoutCorpButtons - checkoutCorpButtons.head
-        val truncatedMap =
-          for ((group, list) <- truncatedCheckoutCorps.map(_.corp).groupBy(i => i)) yield (group, list.length)
+        val truncatedMap = for ((group, list) <- truncatedCheckoutCorps.map(_.corp).groupBy(i => i))
+          yield (group, list.length)
         if (canCheckoutCorp(corp, truncatedMap)) {
           removeComponent(checkoutCorpButtons.head)
           checkoutCorpButtons -= checkoutCorpButtons.head
-        } else {
-          return
+          addNewCheckoutButton(corp)
         }
-      } else {
-        return
-      }
-    }
 
-    val newButton: CorpButton = new CorpButton(engine, corp)
-    checkoutCorpButtons += newButton
-    val pos = checkoutCorpButtonPosition(checkoutCorpButtons.length - 1)
-    addComponent(newButton, pos._1, pos._2)
-    newButton.registerClickHandler((Unit) => {
-      checkoutCorpButtons -= newButton
-      removeComponent(newButton)
-      updateCheckoutButtonsLocations()
-    })
+      case _ => ()
+    }
   }
 
   override def draw(gc: GraphicsContext): Unit = {
@@ -104,5 +94,17 @@ class CorpPrompt(engine: Engine, val message: String, val corpChoices: Seq[Int],
       val button = checkoutCorpButtons(i)
       updateComponent(button, pos._1, pos._2)
     }
+  }
+
+  private def addNewCheckoutButton(corp: Int) = {
+    val newButton: CorpButton = new CorpButton(engine, corp)
+    checkoutCorpButtons += newButton
+    val pos = checkoutCorpButtonPosition(checkoutCorpButtons.length - 1)
+    addComponent(newButton, pos._1, pos._2)
+    newButton.registerClickHandler((Unit) => {
+      checkoutCorpButtons -= newButton
+      removeComponent(newButton)
+      updateCheckoutButtonsLocations()
+    })
   }
 }
