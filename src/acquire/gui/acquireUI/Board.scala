@@ -1,7 +1,7 @@
 package acquire.gui.acquireUI
 
 import acquire.engine.Engine
-import acquire.gui.theatre.ActorWithComponents
+import theatre.core.ActorWithComponents
 
 class Board(val engine: Engine) extends ActorWithComponents {
   val tiles: IndexedSeq[IndexedSeq[TilePiece]] =

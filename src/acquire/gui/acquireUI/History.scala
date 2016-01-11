@@ -5,7 +5,7 @@ import javafx.scene.Group
 import javafx.scene.control.ListView
 
 import acquire.engine.Engine
-import acquire.gui.theatre.{World, Actor}
+import theatre.core.{World, Actor}
 
 import scala.collection.JavaConverters
 

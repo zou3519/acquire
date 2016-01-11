@@ -1,11 +1,11 @@
-package acquire.gui.theatreUI
+package theatre.ui
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
-import acquire.gui.theatre.{ClickableActor, MouseUtil}
+import theatre.core.{ClickableActor, MouseUtil}
 
 
 class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,

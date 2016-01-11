@@ -1,4 +1,4 @@
-package acquire.gui.theatreUI
+package theatre.ui
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
@@ -6,7 +6,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
 import acquire.gui.Colors
-import acquire.gui.theatre.ActorWithComponents
+import theatre.core.ActorWithComponents
 
 class NumberInput extends ActorWithComponents {
   val up: Button = new Button(10,10,Colors.colors(3), Color.web("606060"), "▲")

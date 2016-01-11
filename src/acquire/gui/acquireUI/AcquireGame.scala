@@ -2,7 +2,7 @@ package acquire.gui.acquireUI
 
 import acquire.engine.{Engine, PlayerType}
 import acquire.gui.acquireUI
-import acquire.gui.theatre.Actor
+import theatre.core.Actor
 import acquire.state._
 import mcts.{TreeNode, UCT}
 

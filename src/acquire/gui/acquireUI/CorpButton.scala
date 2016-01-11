@@ -4,7 +4,7 @@ import javafx.scene.paint.Color
 
 import acquire.engine.Engine
 import acquire.gui.Colors
-import acquire.gui.theatreUI.Button
+import theatre.ui.Button
 
 // TODO: remove engine dependency?
 class CorpButton(engine: Engine, val corp: Int) extends

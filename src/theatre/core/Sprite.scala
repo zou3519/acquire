@@ -1,4 +1,4 @@
-package acquire.gui.theatre
+package theatre.core
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.image.Image

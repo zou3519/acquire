@@ -2,7 +2,7 @@ package acquire.gui.acquireUI
 
 import acquire.engine.Engine
 import acquire.gui.Default
-import acquire.gui.theatre.Theatre
+import theatre.core.Theatre
 
 class AcquireTheatre extends Theatre {
 

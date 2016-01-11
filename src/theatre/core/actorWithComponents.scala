@@ -1,4 +1,4 @@
-package acquire.gui.theatre
+package theatre.core
 
 import javafx.scene.canvas.GraphicsContext
 
@@ -64,4 +64,4 @@ abstract class ActorWithComponents extends Actor {
   }
 }
 
-sealed class Component private[theatre](val actor: Actor, var xOffset: Double, var yOffset: Double)
+sealed class Component private[core](val actor: Actor, var xOffset: Double, var yOffset: Double)

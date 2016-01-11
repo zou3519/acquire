@@ -4,7 +4,7 @@ import javafx.scene.paint.Color
 
 import acquire.engine.Engine
 import acquire.gui.Default
-import acquire.gui.theatre.World
+import theatre.core.World
 
 class AcquireWorld(engine: Engine) extends World(1024, 768) {
 

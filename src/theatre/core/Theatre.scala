@@ -1,4 +1,4 @@
-package acquire.gui.theatre
+package theatre.core
 
 import javafx.animation.AnimationTimer
 import javafx.application.Application

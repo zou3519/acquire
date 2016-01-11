@@ -1,4 +1,4 @@
-package acquire.gui.theatre
+package theatre.core
 
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent

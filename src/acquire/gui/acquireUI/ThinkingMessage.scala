@@ -5,7 +5,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
 import acquire.gui.Colors
-import acquire.gui.theatre.{Actor, World}
+import theatre.core.{Actor, World}
 
 class ThinkingMessage(player: String, timerMillis: Int) extends Actor {
 

@@ -6,8 +6,8 @@ import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 
 import acquire.engine.Engine
-import acquire.gui.theatre.{ActorWithComponents, Actor, World}
-import acquire.gui.theatreUI.{NumberInput, Button}
+import theatre.core.{ActorWithComponents, Actor, World}
+import theatre.ui.{NumberInput, Button}
 
 class MergeTransactionPrompt(engine: Engine) extends ActorWithComponents {
 

@@ -1,4 +1,4 @@
-package acquire.gui.theatre
+package theatre.core
 
 abstract class ClickableActor extends Actor {
   private var _clickHandler: (Unit) => Unit = (Unit) => ()

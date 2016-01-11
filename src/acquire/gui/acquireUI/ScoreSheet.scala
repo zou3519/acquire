@@ -6,7 +6,7 @@ import javafx.scene.transform.Affine
 
 import acquire.engine.Engine
 import acquire.gui.Colors
-import acquire.gui.theatre.Actor
+import theatre.core.Actor
 
 class ScoreSheet(engine: Engine) extends Actor {
 
