@@ -26,7 +26,6 @@ class ThinkingMessage(player: String, timerMillis: Int) extends Actor {
   }
 
   override def draw(gc: GraphicsContext): Unit = {
-    // text message
     gc.setFont(font)
     gc.setFill(Colors.colors(0))
     gc.setTextAlign(TextAlignment.CENTER)

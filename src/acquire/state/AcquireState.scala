@@ -53,27 +53,8 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     if (canEndGame) Vector(false, true).map(b => EndTurn(currentPlayer, b))
     else Vector(EndTurn(currentPlayer, endGame = false))
 
-//  // there can be a lot of these
-//  private def legalBuySharesMoves: IndexedSeq[BuyShares] = {
-//    val shares: Seq[Option[Int]] = config.corps.filter(sheet.hasChain) flatMap {
-//      corp => {
-//        val maxPurchase: Int = math.min(3, sheet.cash(currentPlayer) / sheet.sharePrice(corp).get)
-//        Vector().padTo(math.min(maxPurchase, sheet.chainSize(corp).get), Some(corp))
-//      }
-//    }
-//    val sharesWithNones: Seq[Option[Int]] = shares ++ Seq(None, None, None)
-//    val combos: Iterator[Seq[Option[Int]]] = sharesWithNones.combinations(3)
-//    val allShareMaps: Iterator[Map[Int, Int]] = combos.map(combo => combo.groupBy(identity) collect {
-//      case (Some(num), lst) => (num, lst.size)
-//    })
-//    allShareMaps collect {
-//      case shareMap if isValidBuySharesMap(shareMap) => BuyShares(currentPlayer, shareMap)
-//    } toIndexedSeq
-//  }
-
   private def combinations(lst: Seq[Int]): IndexedSeq[Seq[Int]] =
     Combo.combinations(lst.toArray, 3).map(_.toSeq).toIndexedSeq
-    //lst.combinations(3).toIndexedSeq
 
   private def legalBuySharesMoves: IndexedSeq[BuyShares] = {
     def bank(corp: Int) = sheet.bankShares(corp)
@@ -128,10 +109,8 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   private def legalMergeTransactionMoves: IndexedSeq[MergeTransaction] = {
     val total = sheet.shares(preyCorp.get, currentPlayer)
     val tradeLimit = sheet.bankShares(predatorCorp.get)*2
-    for {
-      trade <- 0 to tradeLimit by 2
-      sell <- 0 to (total - trade)
-    } yield MergeTransaction(currentPlayer, preyCorp.get, predatorCorp.get, sell, trade)
+    for (trade <- 0 to tradeLimit by 2; sell <- 0 to (total - trade))
+      yield MergeTransaction(currentPlayer, preyCorp.get, predatorCorp.get, sell, trade)
   }
 
 
@@ -407,11 +386,8 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     require(_n1CorpsForMerge.get.contains(prey) || _n2CorpsForMerge.get.contains(prey),
       "prey has to be one of the second largest corps")
 
-    for ((player, bonus) <- bonuses(prey)) {
+    for ((player, bonus) <- bonuses(prey))
       sheet.setCash(player)(sheet.cash(player) + bonus)
-    }
-
-
 
     makeMergeChoice(prey, predator)
     proceedToDecision(player, MoveType.MergeTransactionT)
@@ -459,7 +435,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     _n2CorpsForMerge = None
   }
 
-  private def nextPlayer(player: Int): Int = (player + 1) % numPlayers
+  def nextPlayer(player: Int): Int = (player + 1) % numPlayers
 
   private def mergeTransaction(player: Int, sellAmt: Int, tradeAmt: Int): Unit = {
     require(_mergerOccurring, "merger must be occurring")

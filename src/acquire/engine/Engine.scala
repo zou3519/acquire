@@ -1,6 +1,5 @@
 package acquire.engine
 
-import scala.concurrent.Future
 import acquire.engine.PlayerType.PlayerType
 import acquire.state._
 
@@ -14,7 +13,7 @@ object EngineDefaults {
       val player: String = state.config.playerName(move.playerId)
       move match {
         case EndTurn(playerId, endGame) =>
-          val nextPlayer = state.config.playerName((playerId + 1)%4) // TODO: remove hardcoding
+          val nextPlayer = state.config.playerName((playerId + 1)%state.numPlayers)
           if (endGame) {
             val corpBonusMessages: Seq[Seq[String]] = for {
               corpId <- state.config.corps
@@ -64,13 +63,14 @@ object EngineDefaults {
           val prey = state.config.corpName(preyCorpId)
           val predator = state.config.corpName(predatorCorpId)
           val newShares = tradeAmt/2
-          f"$player%s sold $sellAmt%d share(s) of $prey%s and traded $tradeAmt%d share(s) of $prey%s " +
-            f"for $newShares%d share(s) of $predator%s"
+          val keptAmt = state.sheet.shares(preyCorpId, state.currentPlayer) - sellAmt - tradeAmt
+          f"$player%s kept $keptAmt%d, sold $sellAmt%d, and traded $tradeAmt%d share(s) of $prey%s. " +
+            f"Received $newShares%d share(s) of $predator%s"
 
         case BuyShares(_, sharesMap) =>
           if (sharesMap.isEmpty) {
             if (state.config.corps.forall(corp => !state.sheet.hasChain(corp) || state.sheet.chainSize(corp).get == 0)) {
-              f"$player%s could not buy shares: no available shares"
+              f"$player%s could not buy shares: there were no shares available for purchase"
             } else if (state.legalMoves.length == 1) {
               f"$player%s could not afford any shares"
             } else {
@@ -127,6 +127,8 @@ class Engine(players: IndexedSeq[(String, PlayerType)]) {
     // prepare for the next move
     _state = nextState
     _numMoves += 1
+
+    println(_state.prettyPrint)
 
     // if there's only one option make the option
     val legalMoves = state.legalMoves

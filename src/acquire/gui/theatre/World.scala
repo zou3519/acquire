@@ -41,6 +41,12 @@ class World {
     }
   }
 
-  def drawActors(gc: GraphicsContext): Unit =
-    actors.foreach(_.draw(gc))
+  def drawActors(gc: GraphicsContext): Unit = {
+    val actorsIterator = actors.clone.toIterator
+    while (actorsIterator.hasNext) {
+      val actor = actorsIterator.next()
+      if (actor.worldOpt.isDefined) actor.draw(gc)
+    }
+  }
+
 }
