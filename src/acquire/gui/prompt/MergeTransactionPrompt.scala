@@ -7,11 +7,14 @@ import javafx.scene.text.TextAlignment
 
 import acquire.engine.Engine
 import acquire.gui.Button
-import acquire.gui.theatre.{Actor, World}
+import acquire.gui.theatre.{ActorWithComponents, Actor, World}
 
-class MergeTransactionPrompt(engine: Engine) extends Actor {
-  _height = 284
-  _width = 388
+class MergeTransactionPrompt(engine: Engine) extends ActorWithComponents {
+
+  val submitButton: Button = new Button(50, 50, Color.web("0093ff"), Color.web("0093ff").darker().darker(), "OK")
+  val sell: NumberInput = new NumberInput()
+  val trade: NumberInput = new NumberInput()
+  var keep: Int = engine.state.sheet.shares(engine.state.preyCorp.get, engine.state.currentPlayer)
 
   val message = {
     val preyCorp = engine.state.preyCorp.get
@@ -29,57 +32,42 @@ class MergeTransactionPrompt(engine: Engine) extends Actor {
     )
   }
 
-  val submitButton: Button = new Button(50, 50, Color.web("0093ff"), Color.web("0093ff").darker().darker(), "OK")
-  val sell: NumberInput = new NumberInput()
-  val trade: NumberInput = new NumberInput()
-  var keep: Int = engine.state.sheet.shares(engine.state.preyCorp.get, engine.state.currentPlayer)
+  init()
 
-  sell.up.registerClickHandler((Unit) => {
-    if (keep >= 1 && engine.state.sheet.shares(engine.state.preyCorp.get, engine.state.currentPlayer) > sell.value) {
-      keep -= 1
-      sell.value += 1
-    }
-  })
-  sell.down.registerClickHandler((Unit) => {
-    if (sell.value >= 1) {
-      keep += 1
-      sell.value -= 1
-    }
-  })
-  trade.up.registerClickHandler((Unit) => {
-    if (keep >= 2 && engine.state.sheet.bankShares(engine.state.predatorCorp.get) > trade.value/2 ) {
-      keep -= 2
-      trade.value += 2
-    }
-  })
-  trade.down.registerClickHandler((Unit) => {
-    if (trade.value >= 2) {
-      keep += 2
-      trade.value -= 2
-    }
-  })
+  private def init(): Unit = {
+    _height = 284
+    _width = 388
+
+    addComponent(sell, 60+100, 150)
+    addComponent(trade, 60+200, 150)
+    addComponent(submitButton, 330, 284-58)
+
+    sell.up.registerClickHandler((Unit) => {
+      if (keep >= 1 && engine.state.sheet.shares(engine.state.preyCorp.get, engine.state.currentPlayer) > sell.value) {
+        keep -= 1; sell.value += 1
+      }
+    })
+    sell.down.registerClickHandler((Unit) => {
+      if (sell.value >= 1) {
+        keep += 1
+        sell.value -= 1
+      }
+    })
+    trade.up.registerClickHandler((Unit) => {
+      if (keep >= 2 && engine.state.sheet.bankShares(engine.state.predatorCorp.get) > trade.value/2 ) {
+        keep -= 2
+        trade.value += 2
+      }
+    })
+    trade.down.registerClickHandler((Unit) => {
+      if (trade.value >= 2) {
+        keep += 2
+        trade.value -= 2
+      }
+    })
+  }
 
   def getAmounts: (Int, Int, Int) = (keep, sell.value, trade.value)
-
-  override def addedToWorld(world: World): Unit = {
-    world.addActor(sell, x + 60 + 100, y + 150)
-    world.addActor(trade, x+60 + 200, y + 150)
-    world.addActor(submitButton, x+330, y+(284-58))
-  }
-
-  override def removedFromWorld(world: World): Unit = {
-    world.removeActor(sell)
-    world.removeActor(trade)
-    world.removeActor(submitButton)
-  }
-
-  override def setPosition(x: Double, y: Double): Unit = {
-    if (worldOpt.isDefined) {
-      sell.setPosition(x+60 + 100, y+150)
-      trade.setPosition(x+60 + 200, y+150)
-      submitButton.setPosition(x+330, y+(284-58))
-    }
-  }
 
   override def draw(gc: GraphicsContext): Unit = {
     // background fill
@@ -109,6 +97,6 @@ class MergeTransactionPrompt(engine: Engine) extends Actor {
     gc.fillText("trade 2:1", x+260 + 45/2, y + 130)
     gc.fillText(keep.toString, x + 60, y + 150 + 20)
 
-    submitButton.draw(gc)
+    super.draw(gc)
   }
 }
