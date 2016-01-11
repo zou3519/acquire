@@ -5,7 +5,7 @@ import javafx.scene.Group
 import javafx.scene.control.ListView
 
 import acquire.engine.Engine
-import acquire.gui.theatre.Actor
+import acquire.gui.theatre.{World, Actor}
 
 import scala.collection.JavaConverters
 
@@ -20,8 +20,13 @@ class History(val engine: Engine) extends Actor {
 
   private var currentNumMoves = 0
 
-  def addToGroup(root: Group): Unit =
-    root.getChildren.add(list)
+//  def addToGroup(root: Group): Unit =
+//    root.getChildren.add(list)
+
+  override def addedToWorld(world: World) = {
+    super.addedToWorld(world)
+    world.addNode(list)
+  }
 
   override def update(): Unit = {
     if (currentNumMoves != engine.numMoves) {
