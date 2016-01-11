@@ -57,8 +57,6 @@ public class Main extends Application {
 
         AcquireGame game = new AcquireGame(engine, board, sheet);
 
-
-
         world.addActor(game, 0, 0);
 
 

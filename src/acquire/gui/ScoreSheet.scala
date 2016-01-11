@@ -26,7 +26,7 @@ class ScoreSheet(engine: Engine) extends Actor {
 
   private val viewFns: Vector[Seq[Int] => Seq[String]] =
     (for(player <- 0 until 4) yield playerRowView(player)).toVector ++ Vector(
-    rowView("size", engine.state.sheet.chainSize),
+    rowView("size", corp => engine.state.sheet.chainSize(corp)),
     rowView("bank", corp => Some(engine.state.sheet.bankShares(corp))),
     rowView("price/100", engine.state.sheet.sharePrice(_).map(_/100)),
     rowView("major/100", engine.state.sheet.firstBonus(_).map(_/100)),

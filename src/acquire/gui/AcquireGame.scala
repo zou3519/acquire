@@ -200,10 +200,15 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
 
   private def setupMctsAiMove(): Unit = {
     require(!hasSetupAiMove)
+
+    val message: ThinkingMessage = new ThinkingMessage(engine.config.playerName(engine.state.currentPlayer), 5000)
+    worldOpt.get.addActor(message, 820, 580)
+
     hasSetupAiMove = true
     getMctsAiMove.onComplete {
       case Success(move) =>
         aiChosenMove = Some(move)
+        worldOpt.get.removeActor(message)
       case Failure(ex) =>
         println(s"${ex.printStackTrace()}")
     }

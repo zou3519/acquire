@@ -6,7 +6,6 @@ import javafx.scene.paint.Color
 import javafx.scene.text.{TextAlignment, FontWeight, Font}
 
 import acquire.engine.{PlayerType, Engine}
-import acquire.gui.ClickableActor
 import acquire.state._
 
 class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableActor {
@@ -41,7 +40,7 @@ class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableAct
   override def update(): Unit = {
     super.update()
     setType(engine.state.board.tileAt(row,col))
-    if (engine.state.tileRack(engine.state.currentPlayer).contains(Locations.Store(row)(col))) {
+    if (engine.currentPlayerType == PlayerType.Human && engine.state.tileRack(engine.state.currentPlayer).contains(Locations.Store(row)(col))) {
       _highlighted = true
     } else {
       _highlighted = false
@@ -81,14 +80,6 @@ class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableAct
       gc.setTextBaseline(VPos.CENTER)
       gc.setFill(Color.web("707070"))
       gc.fillText(corpName, x+ _width/2, y + _height/2)
-
-//      if (corpName != "") {
-//        gc.setFont(font)
-//        gc.setTextAlign(TextAlignment.CENTER)
-//        gc.setTextBaseline(VPos.CENTER)
-//        gc.setFill(tileColor.darker().darker())
-//        gc.fillText(corpName.charAt(0).toString, x + _width/2, y + _height/2)
-//      }
     }
   }
 }
