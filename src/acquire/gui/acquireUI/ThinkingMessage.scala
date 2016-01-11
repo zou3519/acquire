@@ -1,10 +1,11 @@
-package acquire.gui
+package acquire.gui.acquireUI
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.text.{FontWeight, Font, TextAlignment}
+import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
-import acquire.gui.theatre.{World, Actor}
+import acquire.gui.Colors
+import acquire.gui.theatre.{Actor, World}
 
 class ThinkingMessage(player: String, timerMillis: Int) extends Actor {
 

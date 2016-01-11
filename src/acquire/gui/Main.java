@@ -1,6 +1,11 @@
 package acquire.gui;
 
 import acquire.engine.Engine;
+import acquire.gui.acquireUI.AcquireGame;
+import acquire.gui.acquireUI.Board;
+import acquire.gui.acquireUI.History;
+import acquire.gui.acquireUI.ScoreSheet;
+import acquire.gui.theatre.MouseUtil;
 import acquire.gui.theatre.World;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -29,22 +34,20 @@ public class Main extends Application {
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        scene.setOnMouseEntered(event -> MouseUtil.isMouseInScene = true);
-        scene.setOnMouseExited(event -> MouseUtil.isMouseInScene = false);
+        scene.setOnMouseEntered(event -> MouseUtil.isMouseInScene_$eq(true));
+        scene.setOnMouseExited(event -> MouseUtil.isMouseInScene_$eq(false));
         scene.setOnMouseClicked(event -> {
-            MouseUtil.isMouseClicked = true;
+            MouseUtil.isMouseClicked_$eq(true);
             MouseUtil.setClickPosition(event.getSceneX(), event.getSceneY());
         });
-        scene.setOnMousePressed(event -> MouseUtil.isMousePressed = true);
-        scene.setOnMouseReleased(event -> MouseUtil.isMousePressed = false);
+        scene.setOnMousePressed(event -> MouseUtil.isMousePressed_$eq(true));
+        scene.setOnMouseReleased(event -> MouseUtil.isMousePressed_$eq(false));
         scene.setOnMouseMoved(event -> MouseUtil.setPosition(event.getSceneX(), event.getSceneY()));
 
 
         Engine engine = Default.newEngine();
 
         World world = new World();
-
-
         Board board = new Board(engine);
         world.addActor(board, 10, 10);
 
@@ -56,9 +59,7 @@ public class Main extends Application {
         history.addToGroup(root);
 
         AcquireGame game = new AcquireGame(engine, board, sheet);
-
         world.addActor(game, 0, 0);
-
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {

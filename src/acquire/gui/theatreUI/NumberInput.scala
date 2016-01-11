@@ -1,12 +1,12 @@
-package acquire.gui.prompt
+package acquire.gui.theatreUI
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
-import acquire.gui.theatre.{ActorWithComponents, Actor, World}
-import acquire.gui.{Button, Colors}
+import acquire.gui.Colors
+import acquire.gui.theatre.ActorWithComponents
 
 class NumberInput extends ActorWithComponents {
   val up: Button = new Button(10,10,Colors.colors(3), Color.web("606060"), "▲")

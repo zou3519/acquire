@@ -1,11 +1,13 @@
-package acquire.gui
+package acquire.gui.acquireUI
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import javafx.scene.text.{TextAlignment, FontWeight, Font}
+import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
-import acquire.engine.{PlayerType, Engine}
+import acquire.engine.{Engine, PlayerType}
+import acquire.gui.Colors
+import acquire.gui.theatre.{ClickableActor, MouseUtil}
 import acquire.state._
 
 class TilePiece(engine: Engine, val row: Int, val col: Int) extends ClickableActor {

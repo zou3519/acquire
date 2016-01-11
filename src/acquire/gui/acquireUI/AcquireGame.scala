@@ -1,19 +1,19 @@
-package acquire.gui
+package acquire.gui.acquireUI
 
-import acquire.engine.{PlayerType, Engine}
-import acquire.gui.prompt.{MergeTransactionPrompt, CorpPrompt}
+import acquire.engine.{Engine, PlayerType}
+import acquire.gui.acquireUI
 import acquire.gui.theatre.Actor
 import acquire.state._
-import mcts.{UCT, TreeNode}
+import mcts.{TreeNode, UCT}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 /**
   * AcquireGame is an actor! It can't be drawn, though
   */
-class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) extends Actor {
+class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acquireUI.ScoreSheet) extends Actor {
   var count = 0
   private var hasSetupHumanMove = false
   private var hasSetupAiMove = false

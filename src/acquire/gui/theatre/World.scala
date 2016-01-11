@@ -9,7 +9,6 @@ import scala.collection.mutable.ArrayBuffer
   * onto a GraphicsContext object.
   */
 class World {
-
   val actors: ArrayBuffer[Actor] = ArrayBuffer()
 
   def addActor(actor: Actor, x: Double, y: Double): Unit = {

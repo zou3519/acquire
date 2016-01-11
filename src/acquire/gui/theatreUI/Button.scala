@@ -1,11 +1,11 @@
-package acquire.gui
+package acquire.gui.theatreUI
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import javafx.scene.text.{FontWeight, Font, TextAlignment}
+import javafx.scene.text.{Font, FontWeight, TextAlignment}
 
-import acquire.gui.ClickableActor
+import acquire.gui.theatre.{ClickableActor, MouseUtil}
 
 
 class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,
@@ -43,10 +43,6 @@ class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,
     drawButton(buttonFill, buttonFill.darker(), textFill)(gc, x, y)
   private def drawOnMouseDown(gc: GraphicsContext, x: Double, y: Double): Unit =
     drawButton(buttonFill.darker, buttonFill.darker(), textFill)(gc, x, y)
-
-  override def update(): Unit = {
-    super.update()
-  }
 
   override def draw(gc: GraphicsContext): Unit = {
     super.draw(gc)

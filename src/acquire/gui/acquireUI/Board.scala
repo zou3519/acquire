@@ -1,4 +1,4 @@
-package acquire.gui
+package acquire.gui.acquireUI
 
 import acquire.engine.Engine
 import acquire.gui.theatre.ActorWithComponents

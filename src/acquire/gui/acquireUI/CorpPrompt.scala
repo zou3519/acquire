@@ -1,4 +1,4 @@
-package acquire.gui.prompt
+package acquire.gui.acquireUI
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
@@ -6,8 +6,8 @@ import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 
 import acquire.engine.Engine
-import acquire.gui.Button
 import acquire.gui.theatre.{ActorWithComponents, Actor, World}
+import acquire.gui.theatreUI.Button
 
 import scala.collection.mutable.ArrayBuffer
 

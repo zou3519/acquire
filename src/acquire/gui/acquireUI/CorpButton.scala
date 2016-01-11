@@ -1,9 +1,10 @@
-package acquire.gui.prompt
+package acquire.gui.acquireUI
 
 import javafx.scene.paint.Color
 
 import acquire.engine.Engine
-import acquire.gui.{Button, Colors}
+import acquire.gui.Colors
+import acquire.gui.theatreUI.Button
 
 // TODO: remove engine dependency?
 class CorpButton(engine: Engine, val corp: Int) extends

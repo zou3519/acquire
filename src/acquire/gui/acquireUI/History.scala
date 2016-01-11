@@ -1,10 +1,10 @@
-package acquire.gui
+package acquire.gui.acquireUI
 
-import javafx.collections.{ObservableList, FXCollections}
+import javafx.collections.{FXCollections, ObservableList}
 import javafx.scene.Group
 import javafx.scene.control.ListView
 
-import acquire.engine.{EngineDefaults, Engine}
+import acquire.engine.Engine
 import acquire.gui.theatre.Actor
 
 import scala.collection.JavaConverters
