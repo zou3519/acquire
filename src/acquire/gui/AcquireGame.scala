@@ -220,7 +220,7 @@ class AcquireGame(engine: Engine, guiBoard: Board, guiScoreSheet: ScoreSheet) ex
       case 1 =>
         currentNode.legalMoves.head
       case _ =>
-        val bestChild: TreeNode[Move] = UCT.UCTSearch(currentNode, 5000, 5000)
+        val bestChild: TreeNode[Move] = UCT.UCTSearch(currentNode, 5000, 10)
         bestChild.move
     }
   }
