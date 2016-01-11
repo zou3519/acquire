@@ -38,6 +38,7 @@ class ScoreSheet(engine: Engine) extends Actor {
   val cellWidth = 34
   val cellHeight = 28
 
+  // TODO: devise system to color text by value
   override def draw(gc: GraphicsContext): Unit = {
     val corps = Vector("◄ Tower", "◄ Luxor", "◄ American", "◄ Worldwide", "◄ Festival", "◄ Imperial", "◄ Continental", "cash/100", "net worth/100")
 

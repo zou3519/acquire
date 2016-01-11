@@ -9,6 +9,7 @@ import acquire.gui.theatre.Actor
 
 import scala.collection.JavaConverters
 
+// TODO: proper remove mechanics
 class History(val engine: Engine) extends Actor {
   private val list: ListView[String] = new ListView[String]
   private val items: ObservableList[String] = FXCollections.observableArrayList("GAME START")
