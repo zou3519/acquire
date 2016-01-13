@@ -1,6 +1,6 @@
 package acquire.gui.acquireUI
 
-import acquire.engine.{Engine, PlayerType}
+import acquire.engine.{ImpossibleAi, Engine, PlayerType}
 import acquire.gui.acquireUI
 import theatre.core.Actor
 import acquire.state._
@@ -205,7 +205,7 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     worldOpt.get.addActor(message, 820, 580)
 
     hasSetupAiMove = true
-    getMctsAiMove.onComplete {
+    ImpossibleAi.getMove(engine.state).onComplete {
       case Success(move) =>
         aiChosenMove = Some(move)
         worldOpt.get.removeActor(message)
@@ -213,16 +213,4 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
         println(s"${ex.printStackTrace()}")
     }
   }
-
-  private def getMctsAiMove: Future[Move] = Future {
-    val currentNode = new TreeNode[Move](null, engine.state, null)
-    currentNode.legalMoves.length match {
-      case 1 =>
-        currentNode.legalMoves.head
-      case _ =>
-        val bestChild: TreeNode[Move] = UCT.UCTSearch(currentNode, 5000, 10)
-        bestChild.move
-    }
-  }
-
 }

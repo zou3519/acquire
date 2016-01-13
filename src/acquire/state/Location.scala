@@ -3,10 +3,12 @@ package acquire.state
 import scala.collection.mutable
 import scala.util.Random
 
-class Location private[acquire](val row: Int, val col: Int, nRows: Int, nCols: Int) {
+// TODO: static store of neighbors isn't the nicest.
+class Location private[state](val row: Int, val col: Int, nRows: Int, nCols: Int) {
   private val delta = List((0,1), (0, -1), (-1, 0), (1, 0))
 
-  def neighbors: List[Location] = for {
+  // TODO: lazy evaulating neighbors might be a problem
+  lazy val neighbors: List[Location] = for {
     (dr, dc) <- delta
     if inRange(dr+row, 0, nRows) && inRange(dc+col, 0, nCols)
   } yield Locations.Store(row+dr)(col+dc)
