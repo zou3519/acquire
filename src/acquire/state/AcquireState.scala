@@ -522,7 +522,9 @@ class AcquireState private(val config: Config,
   private def hasCorpNeighbor(tile: Location) = neighborTiles(tile).exists(_.isInstanceOf[CorpTile])
 
   private def areNeighborsSafe(tile: Location): Boolean = {
-    val neighborCorps = tile.neighbors.map(board.tileAt).distinct.filter(_.isInstanceOf[CorpTile]).map(_.asInstanceOf[CorpTile]).map(_.corpId)
+    val neighborCorps = tile.neighbors.map(board.tileAt).collect {
+      case CorpTile(id) => id
+    }.distinct
     if (neighborCorps.length < 2) false
     else neighborCorps.forall(isCorpSafe)
   }
