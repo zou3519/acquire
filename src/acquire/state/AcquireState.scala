@@ -57,6 +57,9 @@ class AcquireState private(val config: Config,
   private def combinations(lst: Seq[Int]): IndexedSeq[Seq[Int]] =
     Combo.combinations(lst.toArray, 3).map(_.toSeq).toIndexedSeq
 
+  private def randomCombination(lst: Seq[Int]): Seq[Int] =
+    Random.shuffle(lst).take(3).sorted
+
   private def legalBuySharesMoves: IndexedSeq[BuyShares] = {
     def bank(corp: Int) = sheet.bankShares(corp)
     val price: Array[Int] = config.corps.map(corp => sheet.sharePrice(corp).getOrElse(0)).toArray
@@ -73,6 +76,29 @@ class AcquireState private(val config: Config,
       case Seq(a, b, 9) if b < 7 && price(a) + price(b) <= cash                   => BuyShares(currentPlayer, Map(a -> 1, b -> 1))
       case Seq(a, b, c) if c < 7 && price(a) + price(b) + price(c) <= cash        => BuyShares(currentPlayer, Map(a -> 1, b -> 1, c -> 1))
     }
+  }
+
+  private def randomBuySharesMove: BuyShares = {
+    def bank(corp: Int) = sheet.bankShares(corp)
+    val price: Array[Int] = config.corps.map(corp => sheet.sharePrice(corp).getOrElse(0)).toArray
+    val cash = sheet.cash(currentPlayer)
+    val options: Seq[Int] = config.corps.filter(c => sheet.hasChain(c) && bank(c) >= 1 && price(c) <= cash) ++ Seq(7,8,9)
+
+    var result: BuyShares = null
+    while (result == null) {
+      result = randomCombination(options) match {
+        case Seq(7, 8, 9)                                                           => BuyShares(currentPlayer, Map[Int, Int]())
+        case Seq(a, 7, 8) if bank(a) >= 3 && 3*price(a) <= cash                     => BuyShares(currentPlayer, Map(a -> 3))
+        case Seq(a, 8, 9) if a < 7 && bank(a) >= 2 && 2*price(a) <= cash            => BuyShares(currentPlayer, Map(a -> 2))
+        case Seq(a, 7, 9) if a < 7 && price(a) <= cash                              => BuyShares(currentPlayer, Map(a -> 1))
+        case Seq(a, b, 7) if bank(b) >= 2 && price(a) + 2*price(b) <= cash          => BuyShares(currentPlayer, Map(a -> 1, b -> 2))
+        case Seq(a, b, 8) if b < 7 && bank(a) >= 2 && 2*price(a) + price(b) <= cash => BuyShares(currentPlayer, Map(a -> 2, b -> 1))
+        case Seq(a, b, 9) if b < 7 && price(a) + price(b) <= cash                   => BuyShares(currentPlayer, Map(a -> 1, b -> 1))
+        case Seq(a, b, c) if c < 7 && price(a) + price(b) + price(c) <= cash        => BuyShares(currentPlayer, Map(a -> 1, b -> 1, c -> 1))
+        case _ => null
+      }
+    }
+    result
   }
 
   private def legalFoundCorpMoves: IndexedSeq[FoundCorp] =
@@ -160,6 +186,9 @@ class AcquireState private(val config: Config,
   }
 
   override def randomMove: Option[Move] = {
+    if (expectedMoveType == MoveType.BuySharesT) {
+      return Some(randomBuySharesMove)
+    }
     val moves = legalMoves
     val choice = Random.nextInt(moves.length)
     if (moves.isEmpty) None else Some(moves(choice))
