@@ -9,10 +9,13 @@ trait Board {
   def Rows: Int
   def Cols: Int
 
-  /* queue of tiles that have not been handed to the players yet */
-  def tiles: mutable.Queue[Location]
+//  /* the tiles that have not been played yet */
+//  def availableTiles: mutable.HashSet[Location]
 
-  def shuffleTiles(): Unit
+  /* queue of tiles that have not been handed to the players yet */
+  //def tiles: mutable.Queue[Location]
+
+  //def shuffleTiles(): Unit
 
   def tileAt(row: Int, col: Int): Tile
   def setTileAt(row: Int, col: Int)(tile: Tile): Unit

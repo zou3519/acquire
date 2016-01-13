@@ -7,7 +7,7 @@ object UCT {
     * Simulate with respect to a certain player's perspective
     */
   def simulate(startState: AcquireState, player: Int): IndexedSeq[Double] = {
-    val state: AcquireState = startState.copyForPlayer(player)
+    val state: AcquireState = startState.copy // ForPlayer(player)
     while (!state.isOver) {
       val move: Option[Move] = state.randomMove
       if (move.get.isInstanceOf[EndTurn] && state.canEndGame) {

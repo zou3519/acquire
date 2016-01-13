@@ -9,10 +9,11 @@ import mcts.State
 
 import scala.util.Random
 
-class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet[Location]],
+class AcquireState private(val config: Config,
                            val board: Board, val sheet: ScoreSheet) extends State[Move] {
   val numPlayers: Int = config.players.length
   val numCorps: Int = config.corps.length
+  private var tilesManager = new TilesManager(config.numPlayers)
 
   private var _isOver: Boolean = false               // if the game is over
   private var _whoseTurn: Int = 0                    // which player has a turn
@@ -36,13 +37,13 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   def n2CorpsForMerge  = _n2CorpsForMerge
 
   def this(config: Config) = {
-    this(config, Vector.fill(config.players.length)(new mutable.HashSet), new BoardImpl(), new ScoreSheetImpl(config))
+    this(config, new BoardImpl(), new ScoreSheetImpl(config))
     for (player <- config.players; i <- 0 until 6) {
-      _tileRack(player) += board.tiles.dequeue()
+      tilesManager.drawTile(player)
     }
   }
 
-  def tileRack(player: Int): mutable.HashSet[Location] = _tileRack(player)
+  def tileRack(player: Int): mutable.HashSet[Location] = tilesManager.tileRack(player)
 
   override def isOver: Boolean = _isOver
 
@@ -79,7 +80,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
       case corp if !sheet.hasChain(corp) => FoundCorp(currentPlayer, corp)
     } toIndexedSeq
 
-  private def legalPlaceTileMoves: IndexedSeq[PlaceTile] =
+  protected def legalPlaceTileMoves: IndexedSeq[PlaceTile] =
     tileRack(currentPlayer) collect {
       case tile if canPlaceTile(tile) => PlaceTile(currentPlayer, tile)
     } toIndexedSeq
@@ -185,7 +186,8 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   }
 
   override def copy: AcquireState = {
-    val newState = new AcquireState(config, _tileRack.map(_.clone), board.copy, sheet.copy)
+    val newState = new AcquireState(config, board.copy, sheet.copy)
+    newState.tilesManager = tilesManager.copy
     newState._whoseTurn        = _whoseTurn
     newState._currentPlayer    = _currentPlayer
     newState._expectedMoveType = _expectedMoveType
@@ -200,53 +202,53 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     newState
   }
 
-  def copyForPlayer(currentPlayer: Int): AcquireState = {
-    val boardCopy = board.copy
-    val tileRackCopy = _tileRack.map(_.clone)
-    val newState = new AcquireState(config, tileRackCopy, boardCopy, sheet.copy)
-    newState._whoseTurn        = _whoseTurn
-    newState._currentPlayer    = _currentPlayer
-    newState._expectedMoveType = _expectedMoveType
-    newState._tilePlaced       = _tilePlaced
-    newState._mergerOccurring  = _mergerOccurring
-    if (_mergerOccurring) {
-      newState._predatorCorp     = _predatorCorp
-      newState._preyCorp         = _preyCorp
-      newState._n1CorpsForMerge  = _n1CorpsForMerge
-      newState._n2CorpsForMerge  = _n2CorpsForMerge
-    }
-    // now, shuffle everyone else's tiles
-
-    // maps player id => tiles
-    val numTiles: Map[Int, Int] = (config.players zip tileRackCopy.map(_.size)) toMap
-    val playersToShuffle: Seq[Int] = config.players.filter(_ != currentPlayer)
-
-    // put all the tiles back into the board
-    for (player <- playersToShuffle) {
-      val playerTiles = tileRackCopy(player)
-      while (playerTiles.nonEmpty) {
-        boardCopy.tiles += playerTiles.head
-        playerTiles -= playerTiles.head
-      }
-    }
-
-    boardCopy.shuffleTiles()
-
-    // put the same number of tiles back
-    for (player <- playersToShuffle; i <- 0 until numTiles(player)) {
-      tileRackCopy(player) += boardCopy.tiles.dequeue()
-    }
-
-    // check things
-    for (player <- config.players) {
-      assert(_tileRack(player).size == tileRackCopy(player).size, f"player $player%d has same number of tiles")
-    }
-    tileRack(currentPlayer).foreach(tile =>
-      assert(tileRackCopy(currentPlayer).contains(tile), f"player $currentPlayer%d's rack has tile $tile%s"))
-    assert(board.tiles.length == boardCopy.tiles.length, f"board has same number of tiles")
-
-    newState
-  }
+//  def copyForPlayer(currentPlayer: Int): AcquireState = {
+//    val boardCopy = board.copy
+//    val tileRackCopy = _tileRack.map(_.clone)
+//    val newState = new AcquireState(config, tileRackCopy, boardCopy, sheet.copy)
+//    newState._whoseTurn        = _whoseTurn
+//    newState._currentPlayer    = _currentPlayer
+//    newState._expectedMoveType = _expectedMoveType
+//    newState._tilePlaced       = _tilePlaced
+//    newState._mergerOccurring  = _mergerOccurring
+//    if (_mergerOccurring) {
+//      newState._predatorCorp     = _predatorCorp
+//      newState._preyCorp         = _preyCorp
+//      newState._n1CorpsForMerge  = _n1CorpsForMerge
+//      newState._n2CorpsForMerge  = _n2CorpsForMerge
+//    }
+//    // now, shuffle everyone else's tiles
+//
+//    // maps player id => tiles
+//    val numTiles: Map[Int, Int] = (config.players zip tileRackCopy.map(_.size)) toMap
+//    val playersToShuffle: Seq[Int] = config.players.filter(_ != currentPlayer)
+//
+//    // put all the tiles back into the board
+//    for (player <- playersToShuffle) {
+//      val playerTiles = tileRackCopy(player)
+//      while (playerTiles.nonEmpty) {
+//        boardCopy.tiles += playerTiles.head
+//        playerTiles -= playerTiles.head
+//      }
+//    }
+//
+//    boardCopy.shuffleTiles()
+//
+//    // put the same number of tiles back
+//    for (player <- playersToShuffle; i <- 0 until numTiles(player)) {
+//      tileRackCopy(player) += boardCopy.tiles.dequeue()
+//    }
+//
+//    // check things
+//    for (player <- config.players) {
+//      assert(_tileRack(player).size == tileRackCopy(player).size, f"player $player%d has same number of tiles")
+//    }
+//    tileRack(currentPlayer).foreach(tile =>
+//      assert(tileRackCopy(currentPlayer).contains(tile), f"player $currentPlayer%d's rack has tile $tile%s"))
+//    assert(board.tiles.length == boardCopy.tiles.length, f"board has same number of tiles")
+//
+//    newState
+//  }
 
 
   /*
@@ -274,11 +276,10 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     }
 
     // replace any dead tiles
-    _tileRack(player).foreach(tile => if (areNeighborsSafe(tile)) _tileRack(player) -= tile)
-    while (tileRack(player).size < 6 && board.tiles.nonEmpty) {
-      val nextTile = board.tiles.dequeue()
-      _tileRack(player) += nextTile
-    }
+    for (tile <- tilesManager.tileRack(player))
+      if (areNeighborsSafe(tile)) tilesManager.useTile(tile, player)
+
+    tilesManager.drawUntilFull(player)
 
     beginTurn(nextPlayer(player))
   }
@@ -299,7 +300,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     require(canPlaceTile(tile), "valid tile to place")
 
     board.setTileAt(tile)(OrphanTile())
-    _tileRack(player) -= tile
+    tilesManager.useTile(tile, player)
     _tilePlaced = Some(tile)
 
     // strategy: figure out the unique corps, and if we have any orphans.
@@ -508,7 +509,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
     * @param tile The tile
     * @return If we can place the tile
     */
-  private def canPlaceTile(tile: Location): Boolean = {
+  protected def canPlaceTile(tile: Location): Boolean = {
     noTileAtLocation(tile) && !areNeighborsSafe(tile) && !(allCorpsFormed && !willNotFormNewCorp(tile))
   }
 
@@ -621,7 +622,7 @@ class AcquireState private(val config: Config, _tileRack: Vector[mutable.HashSet
   }
 
   private def prettyPrintTileRack = {
-    _tileRack.map(_.toString).mkString(" | ")
+    config.players.map(player => tilesManager.tileRack(player).toString).mkString(" | ")
   }
 
   def prettyPrintInfo = {
