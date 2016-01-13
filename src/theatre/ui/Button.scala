@@ -9,7 +9,7 @@ import theatre.core.{ClickableActor, MouseUtil}
 
 
 class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,
-                      textString: String) extends ClickableActor {
+                      var textString: String) extends ClickableActor {
   _width = width
   _height = height
   type DrawFunction = ((GraphicsContext, Double, Double) => Unit) // (gc, x, y) => Unit
@@ -24,7 +24,7 @@ class Button(width: Double, height: Double, buttonFill: Color, textFill: Color,
     gc.setFont(font)
     gc.setTextAlign(TextAlignment.CENTER)
     gc.setTextBaseline(VPos.CENTER)
-    gc.fillText(textString, x + _width/2, y + _width/2)
+    gc.fillText(textString, x + _width/2, y + _height/2)
   }
 
   private def drawButton(rectColor: Color, outlineColor: Color, textColor: Color): DrawFunction = (gc, x, y) => {

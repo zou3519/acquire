@@ -22,6 +22,8 @@ abstract class World(width: Double, height: Double) {
   val canvas = new Canvas(width, height)
   val gc = canvas.getGraphicsContext2D
 
+  var theatre: Option[Theatre] = None
+
   init()
 
   private def init(): Unit = {
@@ -38,7 +40,7 @@ abstract class World(width: Double, height: Double) {
 
   /**
     * Add a Scene Node to the world's Scene
-    * @param node
+    * @param node The node to be added
     */
   def addNode(node: Node): Unit = {
     sceneRoot.getChildren.add(node)
