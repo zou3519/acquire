@@ -1,6 +1,7 @@
 package acquire.gui.acquireUI
 
-import acquire.engine.{ImpossibleAi, Engine, PlayerType}
+import acquire.engine._
+import acquire.engine.PlayerType.PlayerType
 import acquire.gui.acquireUI
 import theatre.core.Actor
 import acquire.state._
@@ -24,8 +25,8 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     if (!engine.state.isOver) {
       engine.currentPlayerType match {
         case PlayerType.Human => if (!hasSetupHumanMove) setupHumanMove()
-        case PlayerType.Ai =>
-          if (!hasSetupAiMove) setupMctsAiMove() else {
+        case ai =>
+          if (!hasSetupAiMove) setupAiMove(ai) else {
             if (aiChosenMove.isDefined) {
               engine.makeMove(aiChosenMove.get)
               aiChosenMove = None
@@ -198,14 +199,17 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     count += 1
   }
 
-  private def setupMctsAiMove(): Unit = {
+  private def setupAiMove(aiType: PlayerType): Unit = {
     require(!hasSetupAiMove)
 
     val message: ThinkingMessage = new ThinkingMessage(engine.config.playerName(engine.state.currentPlayer), 5000)
     worldOpt.get.addActor(message, 820, 580)
 
     hasSetupAiMove = true
-    ImpossibleAi.getMove(engine.state).onComplete {
+    (aiType match {
+      case PlayerType.ImpossibleAi => ImpossibleAi
+      case PlayerType.TrivialAi => TrivialAi
+    }).getMove(engine.state).onComplete {
       case Success(move) =>
         aiChosenMove = Some(move)
         worldOpt.get.removeActor(message)

@@ -10,9 +10,9 @@ object Default {
     Seq(200, 200, 300, 300, 300, 400, 400))
   private val playerNames: IndexedSeq[(String, PlayerType)] = Vector(
     ("p0", PlayerType.Human),
-    ("p1", PlayerType.Ai),
-    ("p2", PlayerType.Ai),
-    ("p3", PlayerType.Ai))
+    ("p1", PlayerType.ImpossibleAi),
+    ("p2", PlayerType.ImpossibleAi),
+    ("p3", PlayerType.ImpossibleAi))
   def newState = new AcquireState(new Config(playerNames.map(_._1), corps))
   def newEngine = new Engine(playerNames)
 }
