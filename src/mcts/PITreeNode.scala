@@ -10,13 +10,13 @@ import scala.util.Random
   * @param state The node's corresponding state
   * @param move The move that resulted in this node's state from the parent
   */
-class TreeNode[Move](var parent: TreeNode[Move], val state: State[Move], val move: Move) {
+class PITreeNode[Move](var parent: PITreeNode[Move], val state: State[Move], val move: Move) {
   val legalMoves = state.legalMoves
 
   /* TreeNode has children only when it has been expanded */
   var expanded: Boolean = false
-  private lazy val _children: IndexedSeq[TreeNode[Move]] =
-    legalMoves map { move => new TreeNode[Move](this, state.nextState(move), move) }
+  private lazy val _children: IndexedSeq[PITreeNode[Move]] =
+    legalMoves map { move => new PITreeNode[Move](this, state.nextState(move), move) }
 
   /* TreeNode holds the number of visits and a stats array with entries corresponding to players */
   val stats: Array[Double] = Array.fill(state.numPlayers)(0)
@@ -28,16 +28,16 @@ class TreeNode[Move](var parent: TreeNode[Move], val state: State[Move], val mov
   def isLeaf: Boolean = !expanded
 
   /* the UCT1 function, from the viewpoint of the player who is about to move */
-  val uct1: (TreeNode[Move] => Double) = node => {
+  val uct1: (PITreeNode[Move] => Double) = node => {
     if (visits == 0 || node.visits == 0) Double.PositiveInfinity
     else node.stats(state.currentPlayer) / node.visits + math.sqrt(2 * math.log(visits) / node.visits)
   }
 
   /* children only exist if this node has been expanded */
-  def children: Option[IndexedSeq[TreeNode[Move]]] = if (expanded) Some(_children) else None
+  def children: Option[IndexedSeq[PITreeNode[Move]]] = if (expanded) Some(_children) else None
 
   /* returns the node that results from applying the move to the current state */
-  def nextNode(move: Move): Option[TreeNode[Move]] = {
+  def nextNode(move: Move): Option[PITreeNode[Move]] = {
     if (!expanded) return None
     val index: Int = legalMoves.indexOf(move)
     if (index >= 0) Some(_children(index)) else None
@@ -47,10 +47,10 @@ class TreeNode[Move](var parent: TreeNode[Move], val state: State[Move], val mov
   def makeRoot(): Unit = parent = null
 
   /* select a child based on the UCT criteria */
-  def uctSelectChild: Option[TreeNode[Move]] = if (expanded) Some(_children.sortBy(uct1).last) else None
+  def uctSelectChild: Option[PITreeNode[Move]] = if (expanded) Some(_children.sortBy(uct1).last) else None
 
   /* expand the TreeNode */
-  def expand(): TreeNode[Move] = {
+  def expand(): PITreeNode[Move] = {
     expanded = true
     _children(Random.nextInt(_children.length))
   }

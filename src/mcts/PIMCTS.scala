@@ -2,7 +2,7 @@ package mcts
 
 import acquire.state.{EndTurn, MoveType, Move, AcquireState}
 
-object UCT {
+object PIMCTS {
   /**
     * Simulate with respect to a certain player's perspective
     */
@@ -19,7 +19,7 @@ object UCT {
     state.outcome.get.map(_/10000)
   }
 
-  def UCTSearch[Move](rootNode: TreeNode[Move], iterMax: Int, timeMax: Int): TreeNode[Move] = {
+  def UCTSearch[Move](rootNode: PITreeNode[Move], iterMax: Int, timeMax: Int): PITreeNode[Move] = {
     var iter: Int = 0
     val start = System.currentTimeMillis
 
@@ -49,7 +49,7 @@ object UCT {
 
       iter += 1
     }
-    println("UCT search resulted in a move after %d iter and %d ms".format(iter, System.currentTimeMillis() - start))
+    println("PIUCT search resulted in a move after %d iter and %d ms".format(iter, System.currentTimeMillis() - start))
     //println(rootNode.selfAndKids(0))
     rootNode.children.get.sortBy(_.visits).last
   }
