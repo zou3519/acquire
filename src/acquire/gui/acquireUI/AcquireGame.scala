@@ -2,14 +2,15 @@ package acquire.gui.acquireUI
 
 import acquire.engine._
 import acquire.engine.PlayerType.PlayerType
-import acquire.gui.acquireUI
+import acquire.gui.{Colors, acquireUI}
 import theatre.core.Actor
 import acquire.state._
-import mcts.{PITreeNode, PIMCTS}
+import theatre.ui.Button
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
+
+import javafx.scene.paint.Color
 
 /**
   * AcquireGame is an actor! It can't be drawn, though
@@ -161,6 +162,26 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     })
   }
 
+  private def setupHumanEndTurn() = {
+    // TODO: maybe refactor?
+    val endTurnButton: Button = new Button(100, 40, Colors.colors(6), Color.web("707070"), "End Turn")
+    endTurnButton.registerClickHandler((Unit) => {
+      worldOpt.get.removeActor(endTurnButton)
+      engine.makeMove(EndTurn(engine.state.currentPlayer, endGame = false))
+      hasSetupHumanMove = false
+    })
+    worldOpt.get.addActor(endTurnButton, 770, 700)
+    if (engine.state.canEndGame) {
+      val endGameButton: Button = new Button(100, 40, Colors.colors(3), Color.web("707070"), "End Game")
+      endGameButton.registerClickHandler((Unit) => {
+        worldOpt.get.removeActor(endGameButton)
+        engine.makeMove(EndTurn(engine.state.currentPlayer, endGame = true))
+        hasSetupHumanMove = false
+      })
+      worldOpt.get.addActor(endGameButton, 770, 700 - 60)
+    }
+  }
+
   private def setupHumanFoundCorp() = {
     val prompt: CorpPrompt = createFoundCorpPrompt
     worldOpt.get.addActor(prompt, 624, 470)
@@ -181,7 +202,7 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     hasSetupHumanMove = true
 
     engine.state.expectedMoveType match {
-      case MoveType.EndTurnT => aiMove(); hasSetupHumanMove = false
+      case MoveType.EndTurnT => setupHumanEndTurn()
       case MoveType.PlaceTileT => setupHumanPlaceTile()
       case MoveType.FoundCorpT => setupHumanFoundCorp()
       case MoveType.MergeCorpT => setupHumanMergeCorp1()

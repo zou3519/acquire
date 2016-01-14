@@ -134,9 +134,13 @@ class Engine(players: IndexedSeq[(String, PlayerType)]) {
     println(_state.prettyPrint)
 
     // if there's only one option make the option
-    val legalMoves = state.legalMoves
+    val legalMoves = state.legalMoves // TODO: clean up
     if (legalMoves.length == 1 && state.expectedMoveType != MoveType.PlaceTileT) {
-      makeMove(legalMoves.head)
+      if (state.expectedMoveType == MoveType.EndTurnT && currentPlayerType == PlayerType.Human) {
+
+      } else {
+        makeMove(legalMoves.head)
+      }
     }
   }
 }
