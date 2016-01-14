@@ -30,8 +30,11 @@ object EngineDefaults {
                 }).toSeq
               bonusMessages
             }
+            val nextState = state.nextState(move)
+            val (winner, worth) = nextState.config.players.map(p => (p, nextState.sheet.netWorth(p))).sortBy(_._2).last
+            val winnerMessage = f"${nextState.config.playerName(winner)}%s wins with a net worth of $$$worth%d"
 
-            f"$player%s ended the game.\n" + corpBonusMessages.flatten.mkString("\n")
+            f"$player%s ended the game.\n" + corpBonusMessages.flatten.mkString("\n") + "\n" + winnerMessage
           }
           else f"--------------- $nextPlayer%s's turn ---------------"
 

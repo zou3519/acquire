@@ -17,9 +17,9 @@ class PlayerSelectionPrompt extends ActorWithComponents {
   val choiceButtons =
     (0 to 4).map {
       case 0 => new SingleChoice(
-        Vector("Human"), 200, 40, Color.web("0892D0"), Color.web("444444"))
+        Vector("Human", "AI-Trivial", "AI-ISMCTS", "AI-Impossible"), 200, 40, Color.web("0892D0"), Color.web("444444"))
       case _ => new SingleChoice(
-        Vector("AI-Trivial", "AI-Impossible"), 200, 40, Color.web("0892D0"), Color.web("444444"))
+        Vector("AI-Trivial", "AI-ISMCTS", "AI-Impossible"), 200, 40, Color.web("0892D0"), Color.web("444444"))
     }
   private val font: Font = Font.font("Helvetica", FontWeight.BOLD, 16)
   private val headingFont: Font = Font.font("Helvetica", FontWeight.BOLD, 40)
@@ -47,6 +47,7 @@ class PlayerSelectionPrompt extends ActorWithComponents {
     s match {
       case "Human" => PlayerType.Human
       case "AI-Trivial" => PlayerType.TrivialAi
+      case "AI-ISMCTS" => PlayerType.ISMCTSAi
       case "AI-Impossible" => PlayerType.ImpossibleAi
     }
   }

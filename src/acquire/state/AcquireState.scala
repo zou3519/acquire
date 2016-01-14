@@ -5,15 +5,16 @@ import acquire.state.Shareholder.Shareholder
 
 import scala.collection.mutable
 import acquire.state.impl.{BoardImpl, ScoreSheetImpl}
-import mcts.State
+import mcts.{PartialState, State}
 
 import scala.util.Random
 
-class AcquireState private(val config: Config,
-                           val board: Board, val sheet: ScoreSheet) extends State[Move] {
+class AcquireState private(val config: Config, val board: Board, val sheet: ScoreSheet)
+  extends State[Move] with PartialState[Move] {
+
   val numPlayers: Int = config.players.length
   val numCorps: Int = config.corps.length
-  private var tilesManager = new TilesManager(config.numPlayers)
+  var tilesManager = new TilesManager(config.numPlayers) // TODO: private
 
   private var _isOver: Boolean = false               // if the game is over
   private var _whoseTurn: Int = 0                    // which player has a turn
@@ -49,6 +50,22 @@ class AcquireState private(val config: Config,
 
   /* after the game has ended, outcome is a vector of the player's scores */
   var outcome: Option[IndexedSeq[Double]] = None
+
+  override def determinize: AcquireState = {
+    val copy: AcquireState = this.copy
+    copy.tilesManager.randomizeTiles(currentPlayer)
+
+    // check things
+    for (player <- config.players) {
+      assert(tileRack(player).size == copy.tileRack(player).size, f"player $player%d has same number of tiles")
+    }
+    tileRack(currentPlayer).foreach(tile =>
+      assert(copy.tileRack(currentPlayer).contains(tile), f"player $currentPlayer%d's rack has tile $tile%s"))
+    assert(tilesManager._tilesQueue.length == copy.tilesManager._tilesQueue.length, f"board queue has same number of tiles")
+    assert(tilesManager._availableTiles.size == copy.tilesManager._availableTiles.size, f"board set has same number of tiles")
+
+    copy
+  }
 
   private def legalEndTurnMoves: IndexedSeq[EndTurn] =
     if (canEndGame) Vector(false, true).map(b => EndTurn(currentPlayer, b))
@@ -422,6 +439,12 @@ class AcquireState private(val config: Config,
     makeMergeChoice(prey, predator)
     proceedToDecision(player, MoveType.MergeTransactionT)
   }
+
+  // Maps player to total net worth + bonuses
+//  def netAndBonuses: Map[Int, Int] = {
+//    val bonus: Seq[Int] = bonuses
+//    config.players.map((i, sheet.netWorth(player)))
+//  }
 
   private def beginMerger(): Unit = {
     require(!_mergerOccurring, "merger must not be occurring")

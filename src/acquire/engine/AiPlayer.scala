@@ -1,7 +1,7 @@
 package acquire.engine
 
 import acquire.state.{AcquireState, Move}
-import mcts.{UCT, TreeNode}
+import mcts.{ISMCTS, ISTreeNode, PIMCTS, PITreeNode}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,12 +22,26 @@ object TrivialAi extends AiPlayer {
 
 object ImpossibleAi extends AiPlayer {
   override def getMove(state: AcquireState): Future[Move] = Future {
-    val currentNode = new TreeNode[Move](null, state, null)
+    val currentNode = new PITreeNode[Move](null, state, null)
     currentNode.legalMoves.length match {
       case 1 =>
         currentNode.legalMoves.head
       case _ =>
-        val bestChild: TreeNode[Move] = UCT.UCTSearch(currentNode, 10000, 5000)
+        val bestChild: PITreeNode[Move] = PIMCTS.UCTSearch(currentNode, 10000, 5000)
+        bestChild.move
+    }
+  }
+}
+
+object ISMctsAi extends AiPlayer {
+  override def getMove(state: AcquireState): Future[Move] = Future {
+    val currentNode = new ISTreeNode[Move](null, null, state.numPlayers)
+    val legalMoves = state.legalMoves
+    legalMoves.length match {
+      case 1 =>
+        legalMoves.head
+      case _ =>
+        val bestChild: ISTreeNode[Move] = ISMCTS.UCTSearch(currentNode, state, 10000, 5000)
         bestChild.move
     }
   }

@@ -5,7 +5,7 @@ import acquire.engine.PlayerType.PlayerType
 import acquire.gui.acquireUI
 import theatre.core.Actor
 import acquire.state._
-import mcts.{TreeNode, UCT}
+import mcts.{PITreeNode, PIMCTS}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -209,6 +209,7 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     (aiType match {
       case PlayerType.ImpossibleAi => ImpossibleAi
       case PlayerType.TrivialAi => TrivialAi
+      case PlayerType.ISMCTSAi => ISMctsAi
     }).getMove(engine.state).onComplete {
       case Success(move) =>
         aiChosenMove = Some(move)

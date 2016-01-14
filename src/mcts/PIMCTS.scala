@@ -11,7 +11,9 @@ object PIMCTS {
     while (!state.isOver) {
       val move: Option[Move] = state.randomMove
       if (move.get.isInstanceOf[EndTurn] && state.canEndGame) {
-        state.moveInPlace(EndTurn(move.get.playerId, endGame = true))
+        // if the current player has the most amount of money + bonuses
+        val endGameMove = EndTurn(move.get.playerId, endGame = true)
+        state.moveInPlace(endGameMove)
       } else {
         state.moveInPlace(move.get)
       }
