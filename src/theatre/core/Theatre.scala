@@ -43,6 +43,13 @@ abstract class Theatre extends Application {
   }
 
   /**
+    * Set title
+    */
+  def setTitle(title: String) = {
+    _stage.setTitle(title)
+  }
+
+  /**
     * Creates an animation timer for a world.
     * The animation timer is responsible for updating & drawing the world.
     * @param world The world to create a timer for

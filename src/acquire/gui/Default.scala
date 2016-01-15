@@ -5,7 +5,7 @@ import acquire.engine.{PlayerType, Engine}
 import acquire.state.{Config, AcquireState}
 
 object Default {
-  val VersionString = "0.6.1-β"
+  val VersionString = "0.6.2-β"
   private val corps = Seq("Tower", "Luxor", "American", "Worldwide", "Festival", "Imperial", "Continental").zip(
     Seq(200, 200, 300, 300, 300, 400, 400))
   private val playerNames: IndexedSeq[(String, PlayerType)] = Vector(

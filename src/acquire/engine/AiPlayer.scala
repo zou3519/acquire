@@ -10,17 +10,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Abstraction for an AI player.
   * One can ask the AI for a Future Move.
   */
-trait AiPlayer {
+sealed trait AiPlayer {
   def getMove(state: AcquireState): Future[Move]
 }
 
-class TrivialAi extends AiPlayer {
+case class TrivialAi() extends AiPlayer {
   override def getMove(state: AcquireState): Future[Move] = Future {
     state.randomMove.get
   }
 }
 
-class PIMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
+case class PIMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
   def this() {
     this(10000, 5000)
   }
@@ -37,7 +37,7 @@ class PIMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
   }
 }
 
-class ISMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
+case class ISMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
   def this() {
     this(10000, 5000)
   }

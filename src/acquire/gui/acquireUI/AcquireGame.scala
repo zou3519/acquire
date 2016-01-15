@@ -223,11 +223,17 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
   private def setupAiMove(aiType: PlayerType): Unit = {
     require(!hasSetupAiMove)
 
-    val message: ThinkingMessage = new ThinkingMessage(engine.config.playerName(engine.state.currentPlayer), 5000)
+    val ai = PlayerType.toAi(aiType)
+    val messageTimeMillis = ai match {
+      case TrivialAi() => 100
+      case PIMctsAi(_, time) => time
+      case ISMctsAi(_, time) => time
+    }
+    val message: ThinkingMessage = new ThinkingMessage(engine.config.playerName(engine.state.currentPlayer), messageTimeMillis)
     worldOpt.get.addActor(message, 820, 580)
 
     hasSetupAiMove = true
-    PlayerType.toAi(aiType).getMove(engine.state).onComplete {
+    ai.getMove(engine.state).onComplete {
       case Success(move) =>
         aiChosenMove = Some(move)
         worldOpt.get.removeActor(message)
