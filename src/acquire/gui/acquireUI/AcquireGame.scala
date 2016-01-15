@@ -227,11 +227,7 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     worldOpt.get.addActor(message, 820, 580)
 
     hasSetupAiMove = true
-    (aiType match {
-      case PlayerType.ImpossibleAi => ImpossibleAi
-      case PlayerType.TrivialAi => TrivialAi
-      case PlayerType.ISMCTSAi => ISMctsAi
-    }).getMove(engine.state).onComplete {
+    PlayerType.toAi(aiType).getMove(engine.state).onComplete {
       case Success(move) =>
         aiChosenMove = Some(move)
         worldOpt.get.removeActor(message)

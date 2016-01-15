@@ -14,12 +14,16 @@ import theatre.core.{Theatre, ActorWithComponents}
 import theatre.ui.{Button, SingleChoice}
 
 class PlayerSelectionPrompt extends ActorWithComponents {
+
+  val aiChoices = Vector("AI 0: Coffee Intern", "AI 1: Trading Intern", "AI 2: Trader", "AI 3: Inside Trader")
+  val choices = Vector("Human") ++ aiChoices
+
   val choiceButtons =
     (0 to 4).map {
       case 0 => new SingleChoice(
-        Vector("Human", "AI-Trivial", "AI-ISMCTS", "AI-Impossible"), 200, 40, Color.web("0892D0"), Color.web("444444"))
+        choices, 200, 40, Color.web("0892D0"), Color.web("444444"))
       case _ => new SingleChoice(
-        Vector("AI-Trivial", "AI-ISMCTS", "AI-Impossible"), 200, 40, Color.web("0892D0"), Color.web("444444"))
+        aiChoices, 200, 40, Color.web("0892D0"), Color.web("444444"))
     }
   private val font: Font = Font.font("Helvetica", FontWeight.BOLD, 16)
   private val headingFont: Font = Font.font("Helvetica", FontWeight.BOLD, 40)
@@ -45,10 +49,11 @@ class PlayerSelectionPrompt extends ActorWithComponents {
 
   private def sToPlayerType(s: String): PlayerType = {
     s match {
-      case "Human" => PlayerType.Human
-      case "AI-Trivial" => PlayerType.TrivialAi
-      case "AI-ISMCTS" => PlayerType.ISMCTSAi
-      case "AI-Impossible" => PlayerType.ImpossibleAi
+      case c if c == choices(0) => PlayerType.Human
+      case c if c == aiChoices(0) => PlayerType.CoffeeInternAi
+      case c if c == aiChoices(1) => PlayerType.TradingInternAi
+      case c if c == aiChoices(2) => PlayerType.TraderAi
+      case c if c == aiChoices(3) => PlayerType.InsideTraderAi
     }
   }
 

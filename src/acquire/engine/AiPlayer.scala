@@ -14,26 +14,34 @@ trait AiPlayer {
   def getMove(state: AcquireState): Future[Move]
 }
 
-object TrivialAi extends AiPlayer {
+class TrivialAi extends AiPlayer {
   override def getMove(state: AcquireState): Future[Move] = Future {
     state.randomMove.get
   }
 }
 
-object ImpossibleAi extends AiPlayer {
+class PIMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
+  def this() {
+    this(10000, 5000)
+  }
+
   override def getMove(state: AcquireState): Future[Move] = Future {
     val currentNode = new PITreeNode[Move](null, state, null)
     currentNode.legalMoves.length match {
       case 1 =>
         currentNode.legalMoves.head
       case _ =>
-        val bestChild: PITreeNode[Move] = PIMCTS.UCTSearch(currentNode, 10000, 5000)
+        val bestChild: PITreeNode[Move] = PIMCTS.UCTSearch(currentNode, maxIter, maxMillis)
         bestChild.move
     }
   }
 }
 
-object ISMctsAi extends AiPlayer {
+class ISMctsAi(maxIter: Int, maxMillis: Int) extends AiPlayer {
+  def this() {
+    this(10000, 5000)
+  }
+
   override def getMove(state: AcquireState): Future[Move] = Future {
     val currentNode = new ISTreeNode[Move](null, null, state.numPlayers)
     val legalMoves = state.legalMoves
@@ -41,7 +49,7 @@ object ISMctsAi extends AiPlayer {
       case 1 =>
         legalMoves.head
       case _ =>
-        val bestChild: ISTreeNode[Move] = ISMCTS.UCTSearch(currentNode, state, 10000, 5000)
+        val bestChild: ISTreeNode[Move] = ISMCTS.UCTSearch(currentNode, state, maxIter, maxMillis)
         bestChild.move
     }
   }
