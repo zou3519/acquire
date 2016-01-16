@@ -216,15 +216,6 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
     }
   }
 
-  private def aiMove(): Unit = {
-    // ai's make moves at 1 per second
-    if (count % 120 == 0) {
-      engine.makeMove(engine.state.randomMove.get)
-      println(engine.state.prettyPrint)
-    }
-    count += 1
-  }
-
   private def setupAiMove(aiType: PlayerType): Unit = {
     require(!hasSetupAiMove)
 
