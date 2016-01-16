@@ -83,6 +83,10 @@ Each chain is denoted with a different color and name. The shares of each chain 
 
 After he/she has placed a location tile on the board, the player may choose to buy up to three shares of hotel chain stock. Hotel chain stock is available for purchase only if the hotel currently has a chain on the board and if the bank has remaining shares. Players may not transfer away their shares unless a merger occurs.
 
+### Ending the turn
+
+When the player ends his/her turn, he/she discards his/her "dead" tiles. A dead tile is a location tile that cannot be played because playing it would result in the merger between two or more safe hotel chains. The player then draws tiles until he/she has a total of 6 tiles, or until the board runs out of tiles.
+
 ### Ending the game
 
 A player may end the game at the end of his/her turn if one of the following end game conditions has been met:
