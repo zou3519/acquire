@@ -164,17 +164,22 @@ class AcquireGame(engine: Engine, guiBoard: acquireUI.Board, guiScoreSheet: acqu
 
   private def setupHumanEndTurn() = {
     // TODO: maybe refactor?
+    var endGameButtonOpt: Option[Button] = None
     val endTurnButton: Button = new Button(100, 40, Colors.colors(6), Color.web("707070"), "End Turn")
     endTurnButton.registerClickHandler((Unit) => {
       worldOpt.get.removeActor(endTurnButton)
+      if (endGameButtonOpt.isDefined)
+        worldOpt.get.removeActor(endGameButtonOpt.get)
       engine.makeMove(EndTurn(engine.state.currentPlayer, endGame = false))
       hasSetupHumanMove = false
     })
     worldOpt.get.addActor(endTurnButton, 770, 700)
     if (engine.state.canEndGame) {
       val endGameButton: Button = new Button(100, 40, Colors.colors(3), Color.web("707070"), "End Game")
+      endGameButtonOpt = Some(endGameButton)
       endGameButton.registerClickHandler((Unit) => {
         worldOpt.get.removeActor(endGameButton)
+        worldOpt.get.removeActor(endTurnButton)
         engine.makeMove(EndTurn(engine.state.currentPlayer, endGame = true))
         hasSetupHumanMove = false
       })
