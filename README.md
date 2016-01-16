@@ -7,7 +7,7 @@ This is a computer clone of the old-school multi-player board game Acquire which
 
 The game features intelligent AIs for humans to play against. The AIs run variants of an imperfect information [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search) algorithm that simulates random game play to make decisions. This type of algorithm is significant in that it is able to develop strategy by being given the rules of the game; one can take the algorithm and modify it minimally to work for other games. The game is written in Scala 2.11 and uses JavaFX (Java 8) for graphical rendering.
 
-I chose to make this Acquire clone so that I could better understand the game and have intelligent AI's to play with in my free time. There isn't a good version of the physical board game for sale in today's day and age -- the current Hasbro version isn't the best.
+I chose to make this Acquire clone so that I could better understand the game and have intelligent AI's to play with in my free time. 
 
 Building and Running 
 -----------------------
