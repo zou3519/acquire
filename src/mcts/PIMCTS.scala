@@ -1,19 +1,14 @@
 package mcts
 
-import acquire.state.{EndTurn, MoveType, Move, AcquireState}
+import acquire.state.{EndTurn, Move, AcquireState}
 
 object PIMCTS {
-  /**
-    * Simulate with respect to a certain player's perspective
-    */
-  def simulate(startState: AcquireState, player: Int): IndexedSeq[Double] = {
-    val state: AcquireState = startState.copy // ForPlayer(player)
+  def simulate(startState: AcquireState): IndexedSeq[Double] = {
+    val state: AcquireState = startState.copy
     while (!state.isOver) {
       val move: Option[Move] = state.randomMove
       if (move.get.isInstanceOf[EndTurn] && state.canEndGame) {
-        // if the current player has the most amount of money + bonuses
-        val endGameMove = EndTurn(move.get.playerId, endGame = true)
-        state.moveInPlace(endGameMove)
+        state.moveInPlace(EndTurn(move.get.playerId, endGame = true))
       } else {
         state.moveInPlace(move.get)
       }
@@ -27,7 +22,6 @@ object PIMCTS {
 
     while (iter < iterMax && System.currentTimeMillis - start < timeMax) {
       var node = rootNode
-//      println("iter: " + iter)
 
       /* select */
       while (!node.isLeaf && !node.isTerminal) {
@@ -40,7 +34,7 @@ object PIMCTS {
       }
 
       /* simulate */
-      val result: IndexedSeq[Double] = simulate(node.state.asInstanceOf[AcquireState], rootNode.state.currentPlayer)
+      val result: IndexedSeq[Double] = simulate(node.state.asInstanceOf[AcquireState])
 
       /* propagate */
       while (node.parent != null) {
@@ -52,7 +46,6 @@ object PIMCTS {
       iter += 1
     }
     println("PIUCT search resulted in a move after %d iter and %d ms".format(iter, System.currentTimeMillis() - start))
-    //println(rootNode.selfAndKids(0))
     rootNode.children.get.sortBy(_.visits).last
   }
 }
