@@ -14,8 +14,8 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
 
   val numPlayers: Int = config.players.length
   val numCorps: Int = config.corps.length
-  var tilesManager = new TilesManager(config.numPlayers) // TODO: private
 
+  private var _tilesManager = new TilesManager(config.numPlayers) // _tilesManager manages the game's tiles
   private var _isOver: Boolean = false               // if the game is over
   private var _whoseTurn: Int = 0                    // which player has a turn
   private var _currentPlayer: Int = 0                // which player is making a move (inside someone's turn)
@@ -40,11 +40,11 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
   def this(config: Config) = {
     this(config, new BoardImpl(), new ScoreSheetImpl(config))
     for (player <- config.players; i <- 0 until 6) {
-      tilesManager.drawTile(player)
+      _tilesManager.drawTile(player)
     }
   }
 
-  def tileRack(player: Int): mutable.HashSet[Location] = tilesManager.tileRack(player)
+  def tileRack(player: Int): mutable.HashSet[Location] = _tilesManager.tileRack(player)
 
   override def isOver: Boolean = _isOver
 
@@ -53,7 +53,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
 
   override def determinize: AcquireState = {
     val copy: AcquireState = this.copy
-    copy.tilesManager.randomizeTiles(currentPlayer)
+    copy._tilesManager.randomizeTiles(currentPlayer)
 
     // check things
     for (player <- config.players) {
@@ -61,8 +61,8 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     }
     tileRack(currentPlayer).foreach(tile =>
       assert(copy.tileRack(currentPlayer).contains(tile), f"player $currentPlayer%d's rack has tile $tile%s"))
-    assert(tilesManager._tilesQueue.length == copy.tilesManager._tilesQueue.length, f"board queue has same number of tiles")
-    assert(tilesManager._availableTiles.size == copy.tilesManager._availableTiles.size, f"board set has same number of tiles")
+    assert(_tilesManager._tilesQueue.length == copy._tilesManager._tilesQueue.length, f"board queue has same number of tiles")
+    assert(_tilesManager._availableTiles.size == copy._tilesManager._availableTiles.size, f"board set has same number of tiles")
 
     copy
   }
@@ -233,7 +233,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
 
   override def copy: AcquireState = {
     val newState = new AcquireState(config, board.copy, sheet.copy)
-    newState.tilesManager = tilesManager.copy
+    newState._tilesManager = _tilesManager.copy
     newState._whoseTurn        = _whoseTurn
     newState._currentPlayer    = _currentPlayer
     newState._expectedMoveType = _expectedMoveType
@@ -322,10 +322,10 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     }
 
     // replace any dead tiles
-    for (tile <- tilesManager.tileRack(player))
-      if (areNeighborsSafe(tile)) tilesManager.useTile(tile, player)
+    for (tile <- _tilesManager.tileRack(player))
+      if (areNeighborsSafe(tile)) _tilesManager.useTile(tile, player)
 
-    tilesManager.drawUntilFull(player)
+    _tilesManager.drawUntilFull(player)
 
     beginTurn(nextPlayer(player))
   }
@@ -346,7 +346,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     require(canPlaceTile(tile), "valid tile to place")
 
     board.setTileAt(tile)(OrphanTile())
-    tilesManager.useTile(tile, player)
+    _tilesManager.useTile(tile, player)
     _tilePlaced = Some(tile)
 
     // strategy: figure out the unique corps, and if we have any orphans.
@@ -676,7 +676,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
   }
 
   private def prettyPrintTileRack = {
-    config.players.map(player => tilesManager.tileRack(player).toString).mkString(" | ")
+    config.players.map(player => _tilesManager.tileRack(player).toString).mkString(" | ")
   }
 
   def prettyPrintInfo = {
