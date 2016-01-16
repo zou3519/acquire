@@ -30,10 +30,10 @@ class AcquireWorld(engine: Engine) extends World(1024, 768) {
     gc.fillRect(0, 0, canvas.getWidth, canvas.getHeight)
 
 
-    gc.setFont(font)
-    gc.setTextAlign(TextAlignment.CENTER)
-    gc.setTextBaseline(VPos.CENTER)
-    gc.setFill(Color.web("707070"))
-    gc.fillText(Default.VersionString, 650, 20)
+//    gc.setFont(font)
+//    gc.setTextAlign(TextAlignment.CENTER)
+//    gc.setTextBaseline(VPos.CENTER)
+//    gc.setFill(Color.web("707070"))
+//    gc.fillText(Default.VersionString, 650, 20)
   }
 }
