@@ -12,7 +12,7 @@ I chose to make this Acquire clone so that I could better understand the game an
 Building and Running 
 -----------------------
 Building requires Scala [2.11](http://www.scala-lang.org/index.html) and [Java 8 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). The main class of the project is `acquire.gui.main`.
-Running requires the [Java 8 runtime](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html). If you have a prebuilt JAR file you will only need the Java 8 runtime. Simply double-click the JAR or run `java -jar acquire.jar` on the command line.
+Running requires the [Java 8 runtime](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html). This should work on all operating systems that have Java 8 installed. If you have a prebuilt JAR file you will only need the Java 8 runtime. Simply double-click the JAR or run `java -jar acquire.jar` on the command line.
 
 Rules
 -----------------------
