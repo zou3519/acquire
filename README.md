@@ -5,6 +5,8 @@ This is a computer clone of the old-school multi-player board game Acquire which
 
 The game features intelligent AIs for humans to play against. The AIs run variants of an imperfect information [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search) algorithm that simulates random game play to make decisions. This type of algorithm is significant in that it is able to develop strategy by being given the rules of the game; one can take the algorithm and modify it minimally to work for other games. The game is written in Scala 2.11 and uses JavaFX (Java 8) for graphical rendering.
 
+I chose to make this Acquire clone so that I could better understand the game and have intelligent AI's to play with in my free time. There currently isn't a good version of the physical board game for sale either; the current Hasbro version does not have the best quality.
+
 Building and Running 
 -----------------------
 Building requires Scala [2.11](http://www.scala-lang.org/index.html) and [Java 8 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). The main class of the project is `acquire.gui.main`.
@@ -13,176 +15,83 @@ Running requires the [Java 8 runtime](http://www.oracle.com/technetwork/java/jav
 Rules
 -----------------------
 
-The main objective of Acquire is to earn the most money by the end of the game. To do this, players can form hotel (corporation) chains, buy shares of the hotel chains, merge chains to receive payouts, and increase the size of hotel chains to increase the price of each share.
+The main objective of Acquire is to earn the most money by the end of the game. To do this, players can form hotel (corporation) chains, buy shares of the hotel chains, merge chains to receive payouts, and expand hotel chains to increase the valuation of their shares.
 
 Player start each game with $6,000 in hand. Each player receives 6 location tiles that are hidden from the other players. Play proceeds in a circular manner.
 
 During his/her turn, a player performs the following actions, in order:
 
-1. **Place one of his/her location tiles on the board.** This may result in the creation of a new chain (founding a new corporation), the merger of two or more chains, or the expansion of a hotel chain. All actions pertaining to the founding of a new chain or the merger of chains need to be completed before the next point. 
+1. **Place one of his/her location tiles on the board.** This may result in the creation of a new chain (founding a new corporation), the merger of two or more chains, or the expansion of a hotel chain. All actions pertaining to the founding of a new chain or the merger of chains need to be completed before the next point.
 
-2. **Buy shares.** A player may buy shares in hotel chains (corporations) after he/she has placed his/her tile.
+2. **Buy shares.** A player may buy shares in hotel chains (corporations) after he/she has placed his/her tile. Each hotel chain has a total of 25 shares that may be purchased.
 
 3. **End turn.** The player may decide to end his turn, or end the game if the end game conditions are met. The player draws a random unplayed location tile after he/she has ended his turn.
 
 See the below sections for more details on what happens in each of these phases.
 
+### Placing tiles
+Each tile has four neighbors that may or may not be present (depending on if they have been played) There are four things that can happen when a tile is placed:
 
+1. If the placed tile has no neighbors, then it becomes an orphaned tile that may later be added to a hotel chain
 
+2. If the placed tile's neighbors are all orphaned (not assigned to a hotel chain), then a new hotel chain will be founded with the tile and its neighbors.
 
-*View the [source of this content](http://github.github.com/github-flavored-markdown/sample_content.html).*
+3. If the placed tile's neighbors are all members of one hotel chain or are orphaned, then the placed tile will extend the hotel chain; becoming a part of that specific chain. Its neighbors will also become a part of that hotel chain.
 
-Let's get the whole "linebreak" thing out of the way. The next paragraph contains two phrases separated by a single newline character:
+4. If the placed tile connects two or more different hotel chains, then a merger will occur.
 
-Roses are red
-Violets are blue
+Sometimes, tiles cannot be played. A tile cannot be played if:
 
-The next paragraph has the same phrases, but now they are separated by two spaces and a newline character:
+* It would found an 8th chain
+* It would merge two or more safe chains (hotel chains that have >= 11 tiles)
 
-Roses are red  
-Violets are blue
+If a player cannot place any of his/her tiles, then he proceeds to choose which shares to purchase.
 
-Oh, and one thing I cannot stand is the mangling of words with multiple underscores in them like perform_complicated_task or do_this_and_do_that_and_another_thing.
+### Founding new chains
+When a player places a tile next to one that is already on the board (that is not a part of a chain), a new chain will be formed. The player who played that tile picks from seven possible chains to form. Then, the player receives one free share of the chain he/she formed (if available).
 
-A bit of the GitHub spice
--------------------------
+### Merging hotel chains
+When a player places a tile that is next to two or more chains, a merger occurs. The hotel chain that is the largest will take over the other(s). If multiple hotel chain have the same size, the player who initiated the merger chooses which survives the merger. 
 
-In addition to the changes in the previous section, certain references are auto-linked:
+A hotel chain that has 11 or more tiles is deemed "safe" and cannot be taken over in a merger but may still take over other un-safe hotel chains.
 
-* SHA: be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
-* User@SHA ref: mojombo@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
-* User/Project@SHA: mojombo/god@be6a8cc1c1ecfe9489fb51e4869af15a13fc2cd2
-* \#Num: #1
-* User/#Num: mojombo#1
-* User/Project#Num: mojombo/god#1
+When a merger is occurring, the following occurs, in order:
 
-These are dangerous goodies though, and we need to make sure email addresses don't get mangled:
+1. The player decides which hotel chain survives, if necessary. 
 
-My email addy is tom@github.com.
+2. **Pay out bonuses.** The two shareholders with the most shares of the defunct hotel chain receive merger bonuses from the bank. The largest shareholder receives the majority bonus (of the defunct chain) and the second-largest shareholder receives the minority bonus (of the defunct chain). If there are ties for largest shareholder, those players will split the majority and minority bonuses evenly (and no other shareholders will receive bonuses). If there are ties for second-largest shareholders, those players will split the minority bonus evenly. If only one player owns shares of the defunct chain, he/she receives both the majority and minority bonuses.
 
-Math is hard, let's go shopping
--------------------------------
+3. **Dispose of shares.** Players may choose to dispose of their shares in the defunct hotel chain. Starting with the player who began the merger, going around in a circle, each player may chose to handle his/her shares of the defunct chain with a combination of the following options:
 
-In first grade I learned that 5 > 3 and 2 < 7. Maybe some arrows. 1 -> 2 -> 3. 9 <- 8 <- 7.
+  * **Keep**: A player may keep some of the shares of the defunct chain. They will not be worth any money unless the defunct chain is reformed.
 
-Triangles man! a^2 + b^2 = c^2
+  * **Sell**: A player may sell some of the shares of the defunct chain back to the bank for the current share price.
 
-We all like making lists
-------------------------
+  * **Trade**: A player may trade in shares of the defunct chain to the bank to receive half the amount of shares of the surviving chain, if the bank has enough shares to provide.
 
-The above header should be an H2 tag. Now, for a list of fruits:
+4. The defunct chain's tiles are changed to be those of the hotel chain that took it over.
 
-* Red Apples
-* Purple Grapes
-* Green Kiwifruits
+In the case of multiple mergers, the largest hotel chain takes over the next-largest chain first (with the player making decisions if there are ties in chain size). Then, the largest hotel chain takes over the next-largest chain, and so on.
 
-Let's get crazy:
+### Hotel Chains 101
 
-1.  This is a list item with two paragraphs. Lorem ipsum dolor
-    sit amet, consectetuer adipiscing elit. Aliquam hendrerit
-    mi posuere lectus.
+Each chain is denoted with a different color and name. The shares of each chain are priced differently as a function of the chain and the current chain size. The majority and minority bonuses are also a function of the chain and the current chain size. Please refer to [this well-done information sheet](http://www.webnoir.com/bob/sid/acquirecard.htm) for a reference as to how the chains are priced.
 
-    Vestibulum enim wisi, viverra nec, fringilla in, laoreet
-    vitae, risus. Donec sit amet nisl. Aliquam semper ipsum
-    sit amet velit.
+### Buying shares
 
-2.  Suspendisse id sem consectetuer libero luctus adipiscing.
+After he/she has placed a location tile on the board, the player may choose to buy up to three shares of hotel chain stock. Hotel chain stock is available for purchase only if the hotel currently has a chain on the board and if the bank has remaining shares. Players may not transfer away their shares unless a merger occurs.
 
-What about some code **in** a list? That's insane, right?
+### Ending the game
 
-1. In Ruby you can map like this:
+A player may end the game at the end of his/her turn if one of the following end game conditions has been met:
 
-        ['a', 'b'].map { |x| x.uppercase }
+1. There exists one chain with more than 41 tiles
 
-2. In Rails, you can do a shortcut:
+2. All existing hotel chains are safe, ie, have at least 11 shares, and there exists at least one hotel chain.
 
-        ['a', 'b'].map(&:uppercase)
+When the game ends, the bank pays out majority and minority bonuses for each hotel chain in existence. The player with the highest net worth (cash + shares) after bonuses have been paid out wins!
 
-Some people seem to like definition lists
+References
+---------------------
 
-<dl>
-  <dt>Lower cost</dt>
-  <dd>The new version of this product costs significantly less than the previous one!</dd>
-  <dt>Easier to use</dt>
-  <dd>We've changed the product so that it's much easier to use!</dd>
-</dl>
-
-I am a robot
-------------
-
-Maybe you want to print `robot` to the console 1000 times. Why not?
-
-    def robot_invasion
-      puts("robot " * 1000)
-    end
-
-You see, that was formatted as code because it's been indented by four spaces.
-
-How about we throw some angle braces and ampersands in there?
-
-    <div class="footer">
-        &copy; 2004 Foo Corporation
-    </div>
-
-Set in stone
-------------
-
-Preformatted blocks are useful for ASCII art:
-
-<pre>
-             ,-. 
-    ,     ,-.   ,-. 
-   / \   (   )-(   ) 
-   \ |  ,.>-(   )-< 
-    \|,' (   )-(   ) 
-     Y ___`-'   `-' 
-     |/__/   `-' 
-     | 
-     | 
-     |    -hrr- 
-  ___|_____________ 
-</pre>
-
-Playing the blame game
-----------------------
-
-If you need to blame someone, the best way to do so is by quoting them:
-
-> I, at any rate, am convinced that He does not throw dice.
-
-Or perhaps someone a little less eloquent:
-
-> I wish you'd have given me this written question ahead of time so I
-> could plan for it... I'm sure something will pop into my head here in
-> the midst of this press conference, with all the pressure of trying to
-> come up with answer, but it hadn't yet...
->
-> I don't want to sound like
-> I have made no mistakes. I'm confident I have. I just haven't - you
-> just put me under the spot here, and maybe I'm not as quick on my feet
-> as I should be in coming up with one.
-
-Table for two
--------------
-
-<table>
-  <tr>
-    <th>ID</th><th>Name</th><th>Rank</th>
-  </tr>
-  <tr>
-    <td>1</td><td>Tom Preston-Werner</td><td>Awesome</td>
-  </tr>
-  <tr>
-    <td>2</td><td>Albert Einstein</td><td>Nearly as awesome</td>
-  </tr>
-</table>
-
-Crazy linking action
---------------------
-
-I get 10 times more traffic from [Google] [1] than from
-[Yahoo] [2] or [MSN] [3].
-
-  [1]: http://google.com/        "Google"
-  [2]: http://search.yahoo.com/  "Yahoo Search"
-  [3]: http://search.msn.com/    "MSN Search"
+The rules were referenced from [Avalon Hill's website](https://www.wizards.com/avalonhill/rules/acquire.pdf). Avalon Hill and Hasbro own the rights to the game of Acquire.
