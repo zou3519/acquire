@@ -7,7 +7,7 @@ This is a computer clone of the old-school multi-player board game Acquire which
 
 The game features intelligent AIs for humans to play against. The AIs run variants of an imperfect information [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search) algorithm that simulates random game play to make decisions. This type of algorithm is significant in that it is able to develop strategy by being given the rules of the game; one can take the algorithm and modify it minimally to work for other games. The game is written in Scala 2.11 and uses JavaFX (Java 8) for graphical rendering.
 
-I chose to make this Acquire clone so that I could better understand the game and have intelligent AI's to play with in my free time. There isn't a good version of the physical board game for sale in today's day and age -- the current Hasbro version isn't the best.
+I chose to make this Acquire clone so that I could better understand the game and have intelligent AI's to play with in my free time. 
 
 Building and Running 
 -----------------------
@@ -82,6 +82,10 @@ Each chain is denoted with a different color and name. The shares of each chain 
 ### Buying shares
 
 After he/she has placed a location tile on the board, the player may choose to buy up to three shares of hotel chain stock. Hotel chain stock is available for purchase only if the hotel currently has a chain on the board and if the bank has remaining shares. Players may not transfer away their shares unless a merger occurs.
+
+### Ending the turn
+
+When the player ends his/her turn, he/she discards his/her "dead" tiles. A dead tile is a location tile that cannot be played because playing it would result in the merger between two or more safe hotel chains. The player then draws tiles until he/she has a total of 6 tiles, or until the board runs out of tiles.
 
 ### Ending the game
 
