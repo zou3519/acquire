@@ -48,7 +48,7 @@ abstract class World(width: Double, height: Double) {
 
   /**
     * Remove a Scene Node from this world's Scene
-    * @param node The node to be added
+    * @param node The node to be removed
     */
   def removeNode(node: Node): Unit = {
     sceneRoot.getChildren.remove(node)

@@ -17,16 +17,26 @@ import scala.collection.JavaConverters
 class History(val engine: Engine) extends Actor {
   private val list: ListView[FlowPane] = new ListView[FlowPane]
   private val items: ObservableList[FlowPane] = FXCollections.observableArrayList(new FlowPane)
-  _width = 600
-  _height = 284
-  list.setItems(items)
-  list.setPrefSize(_width, _height)
+
+  init()
+
+  private def init(): Unit = {
+    _width = 600
+    _height = 284
+    list.setItems(items)
+    list.setPrefSize(_width, _height)
+  }
 
   private var currentNumMoves = 0
 
   override def addedToWorld(world: World) = {
     super.addedToWorld(world)
     world.addNode(list)
+  }
+
+  override def removedFromWorld(world: World) = {
+    super.removedFromWorld(world)
+    world.removeNode(list)
   }
 
   override def update(): Unit = {
