@@ -46,8 +46,8 @@ class History(val engine: Engine) extends Actor {
       list.setItems(FXCollections.observableList[FlowPane](moveList))
       currentNumMoves = engine.numMoves
       // hardcoding 13 to avoid what seems like a JavaFx bug
-      if (currentNumMoves >= 13)
-        list.scrollTo(currentNumMoves - 1)
+      if (moveList.size() >= 13)
+        list.scrollTo(moveList.size() - 1)
     }
   }
 
