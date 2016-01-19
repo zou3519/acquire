@@ -13,7 +13,6 @@ import theatre.core.{World, Actor}
 
 import scala.collection.JavaConverters
 
-// TODO: proper remove mechanics
 class History(val engine: Engine) extends Actor {
   private val list: ListView[FlowPane] = new ListView[FlowPane]
   private val items: ObservableList[FlowPane] = FXCollections.observableArrayList(new FlowPane)
