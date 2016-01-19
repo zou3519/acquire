@@ -39,6 +39,10 @@ abstract class Theatre extends Application {
 
     _worldThread = createAnimationTimerFor(world)
     _worldThread.start()
+
+    // start updating and drawing
+    _world.updateWorld()
+    _world.drawWorld()
     _stage.show()
   }
 
