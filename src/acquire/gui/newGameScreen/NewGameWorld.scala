@@ -6,7 +6,6 @@ import theatre.core.World
 import theatre.ui.SingleChoice
 
 class NewGameWorld extends World(600,400) {
-  private val choices = Vector("Human", "AI-Trivial", "AI-Impossible")
 
   override def buildWorld(): Unit = {
     val selectionPrompt = new PlayerSelectionPrompt

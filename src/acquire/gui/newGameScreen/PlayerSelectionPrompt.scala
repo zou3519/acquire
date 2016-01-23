@@ -16,7 +16,7 @@ import theatre.ui.{Button, SingleChoice}
 class PlayerSelectionPrompt extends ActorWithComponents {
 
   val aiChoices = Vector("AI lv0: Office Plant", "AI lv1: Intern", "AI lv2: Trader",
-    "AI lv3: Manager", "AI lv4: Partner", "AI lv∞: Inside Trader")
+    "AI lv3: Manager", "AI lv4: Partner", "AI lv5: CEO", "AI lv∞: Inside Trader")
   val choices = Vector("Human") ++ aiChoices
 
   val choiceButtons =
@@ -56,7 +56,8 @@ class PlayerSelectionPrompt extends ActorWithComponents {
       case c if c == aiChoices(2) => PlayerType.TraderAi
       case c if c == aiChoices(3) => PlayerType.ManagerAi
       case c if c == aiChoices(4) => PlayerType.PartnerAi
-      case c if c == aiChoices(5) => PlayerType.InsideTraderAi
+      case c if c == aiChoices(5) => PlayerType.CeoAi
+      case c if c == aiChoices(6) => PlayerType.InsideTraderAi
     }
   }
 
