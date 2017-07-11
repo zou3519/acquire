@@ -34,7 +34,7 @@ object PIMCTS {
       }
 
       /* simulate */
-      val result: IndexedSeq[Double] = simulate(node.state.asInstanceOf[AcquireState])
+      val result = node.state.simulate
 
       /* propagate */
       while (node.parent != null) {
@@ -46,6 +46,6 @@ object PIMCTS {
       iter += 1
     }
     println("PIUCT search resulted in a move after %d iter and %d ms".format(iter, System.currentTimeMillis() - start))
-    rootNode.children.get.sortBy(_.visits).last
+    rootNode.children.get.maxBy(_.visits)
   }
 }

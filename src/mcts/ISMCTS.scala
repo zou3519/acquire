@@ -1,24 +1,9 @@
 package mcts
 
-import acquire.state.{EndTurn, Move, AcquireState}
-
 /**
-  * Information state MCTS search
+  * Information set MCTS search
   */
 object ISMCTS {
-  def simulate(startState: AcquireState): IndexedSeq[Double] = {
-    val state: AcquireState = startState.copy
-    while (!state.isOver) {
-      val move: Option[Move] = state.randomMove
-      if (move.get.isInstanceOf[EndTurn] && state.canEndGame) {
-        state.moveInPlace(EndTurn(move.get.playerId, endGame = true))
-      } else {
-        state.moveInPlace(move.get)
-      }
-    }
-    state.outcome.get.map(_/10000)
-  }
-
   def UCTSearch[Move](rootNode: ISTreeNode[Move], partialState: PartialState[Move], iterMax: Int, timeMax: Int): ISTreeNode[Move] = {
     var iter: Int = 0
     val start = System.currentTimeMillis
@@ -44,7 +29,7 @@ object ISMCTS {
       }
 
       /* simulate */
-      val result: IndexedSeq[Double] = simulate(determinedState.asInstanceOf[AcquireState])
+      val result = determinedState.simulate
 
       /* propagate */
       while (node.parent != null) {
@@ -56,6 +41,6 @@ object ISMCTS {
       iter += 1
     }
     println("ISUCT search resulted in a move after %d iter and %d ms".format(iter, System.currentTimeMillis() - start))
-    rootNode.children.values.toIndexedSeq.sortBy(_.visits).last
+    rootNode.children.values.toIndexedSeq.maxBy(_.visits)
   }
 }

@@ -704,4 +704,8 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     }
     lines.mkString("\n")
   }
+
+  override def simulate: IndexedSeq[Double] = {
+    AcquireSimulator.simulate(this)
+  }
 }

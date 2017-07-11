@@ -19,4 +19,7 @@ trait State[Move] {
   /* after the game has ended, outcome is a vector of the player's scores */
   def outcome: Option[IndexedSeq[Double]]
   def isOver: Boolean
+
+  /* get random results from this state */
+  def simulate: IndexedSeq[Double]
 }
