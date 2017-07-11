@@ -11,7 +11,7 @@ class ISTreeNode[Move](val parent: ISTreeNode[Move], val move: Move, numPlayers:
   var visits: Int = 0
 
   /* the UCT1 function, from the viewpoint of the player who is about to move */
-  def uct1(state: State[Move]): (ISTreeNode[Move] => Double) = node => {
+  def uct1(state: MCTSStateLike[Move]): (ISTreeNode[Move] => Double) = node => {
     if (visits == 0 || node.visits == 0) Double.PositiveInfinity
     else node.stats(state.currentPlayer) / node.visits + math.sqrt(2 * math.log(visits) / node.visits)
   }
@@ -19,7 +19,7 @@ class ISTreeNode[Move](val parent: ISTreeNode[Move], val move: Move, numPlayers:
   def children: mutable.Map[Move, ISTreeNode[Move]] = _children
 
   /* Select a child based on the UCT criteria */
-  def uctSelectChild(state: State[Move]): Option[ISTreeNode[Move]] = {
+  def uctSelectChild(state: MCTSStateLike[Move]): Option[ISTreeNode[Move]] = {
     val legalMoves = state.legalMoves
 
     // If this node doesn't contain any of the state's possible states, return None for no selection
@@ -34,7 +34,7 @@ class ISTreeNode[Move](val parent: ISTreeNode[Move], val move: Move, numPlayers:
   }
 
   /* expand the ISTreeNode using the state */
-  def expand(state: State[Move]): Option[ISTreeNode[Move]] = {
+  def expand(state: MCTSStateLike[Move]): Option[ISTreeNode[Move]] = {
     val legalMoves = state.legalMoves
     if (legalMoves.isEmpty) None
     else {

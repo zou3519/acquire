@@ -6,12 +6,12 @@ import acquire.state.Shareholder.Shareholder
 
 import scala.collection.mutable
 import acquire.state.impl.{BoardImpl, ScoreSheetImpl}
-import mcts.{PartialState, State}
+import mcts.{PartialState, MCTSStateLike}
 
 import scala.util.Random
 
 class AcquireState private(val config: Config, val board: Board, val sheet: ScoreSheet)
-  extends State[Move] with PartialState[Move] {
+  extends MCTSStateLike[Move] with PartialState[Move] {
 
   val numPlayers: Int = config.players.length
   val numCorps: Int = config.corps.length
@@ -47,7 +47,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
 
   def tileRack(player: Int): mutable.HashSet[Location] = _tilesManager.tileRack(player)
 
-  override def isOver: Boolean = _isOver
+  def isOver: Boolean = _isOver
 
   /* after the game has ended, outcome is a vector of the player's scores */
   var outcome: Option[IndexedSeq[Double]] = None
@@ -203,7 +203,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     totalPrice <= sheet.cash(currentPlayer)
   }
 
-  override def randomMove: Option[Move] = {
+  def randomMove: Option[Move] = {
     if (expectedMoveType == MoveType.BuySharesT) {
       return Some(randomBuySharesMove)
     }

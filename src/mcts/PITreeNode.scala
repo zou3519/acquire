@@ -10,7 +10,7 @@ import scala.util.Random
   * @param state The node's corresponding state
   * @param move The move that resulted in this node's state from the parent
   */
-class PITreeNode[Move](var parent: PITreeNode[Move], val state: State[Move], val move: Move) {
+class PITreeNode[Move](var parent: PITreeNode[Move], val state: MCTSStateLike[Move], val move: Move) {
   val legalMoves = state.legalMoves
 
   /* TreeNode has children only when it has been expanded */
