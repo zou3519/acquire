@@ -1,5 +1,6 @@
 package acquire.state
 
+import acquire.state
 import acquire.state.MoveType.MoveType
 import acquire.state.Shareholder.Shareholder
 
@@ -27,15 +28,15 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
   private var _n1CorpsForMerge: Option[Seq[Int]] = None // when merging, the corps around the tile that are the largest
   private var _n2CorpsForMerge: Option[Seq[Int]] = None // when merging, the next largest corps (sometimes not needed)
 
-  def whoseTurn        = _whoseTurn
-  def currentPlayer    = _currentPlayer
-  def expectedMoveType = _expectedMoveType
-  def tilePlaced       = _tilePlaced
-  def mergerOccurring  = _mergerOccurring
-  def predatorCorp     = _predatorCorp
-  def preyCorp         = _preyCorp
-  def n1CorpsForMerge  = _n1CorpsForMerge
-  def n2CorpsForMerge  = _n2CorpsForMerge
+  def whoseTurn: Int = _whoseTurn
+  def currentPlayer: Int = _currentPlayer
+  def expectedMoveType: state.MoveType.Value = _expectedMoveType
+  def tilePlaced: Option[Location] = _tilePlaced
+  def mergerOccurring: Boolean = _mergerOccurring
+  def predatorCorp: Option[Int] = _predatorCorp
+  def preyCorp: Option[Int] = _preyCorp
+  def n1CorpsForMerge: Option[Seq[Int]] = _n1CorpsForMerge
+  def n2CorpsForMerge: Option[Seq[Int]] = _n2CorpsForMerge
 
   def this(config: Config) = {
     this(config, new BoardImpl(), new ScoreSheetImpl(config))
@@ -632,7 +633,7 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
   }
 
   /* ------------------------- PRINTING ------------------------------ */
-  def prettyPrintStats() = {
+  def prettyPrintStats: String = {
     val rows = Vector.concat(config.players.map(config.playerName).toVector, Vector("sz", "bank","cost","lg$", "sm$" ))
     val cols = Vector.concat(config.corps.map(config.corpName).map(_.charAt(0).toString).toVector, Vector("$$", "net"))
 
@@ -665,9 +666,9 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     Seq.concat(Seq(firstRow), nextRows).mkString("\n")
   }
 
-  def prettyPrint = {
-    val board = prettyPrintBoard()
-    val stats = prettyPrintStats()
+  def prettyPrint: String = {
+    val board = prettyPrintBoard
+    val stats = prettyPrintStats
     val boardSep = board.split("\n").toVector
     val statsSep = stats.split("\n").toVector
     val line = "".padTo(80, '-')
@@ -679,13 +680,13 @@ class AcquireState private(val config: Config, val board: Board, val sheet: Scor
     config.players.map(player => _tilesManager.tileRack(player).toString).mkString(" | ")
   }
 
-  def prettyPrintInfo = {
+  def prettyPrintInfo: String = {
     val somelst = List(_whoseTurn, _currentPlayer, _expectedMoveType, _tilePlaced,
       _mergerOccurring, _predatorCorp, _preyCorp, _n1CorpsForMerge, _n2CorpsForMerge)
     somelst.map(_.toString).mkString(", ")
   }
 
-  def prettyPrintBoard() = {
+  def prettyPrintBoard: String = {
     def rowView(row: Int): Seq[String] = row match {
       case 9 => for (r <- 0 to board.Cols) yield if (r == 0) "" else r.toString
       case _ =>
