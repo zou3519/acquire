@@ -1,5 +1,5 @@
 package mcts
 
-trait PartialState[Move] {
+trait MCTSPartialStateLike[Move] {
   def determinize: MCTSStateLike[Move]
 }

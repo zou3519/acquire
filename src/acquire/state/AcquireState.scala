@@ -6,12 +6,16 @@ import acquire.state.Shareholder.Shareholder
 
 import scala.collection.mutable
 import acquire.state.impl.{BoardImpl, ScoreSheetImpl}
-import mcts.{PartialState, MCTSStateLike}
+import mcts.{MCTSPartialStateLike, MCTSStateLike}
 
 import scala.util.Random
 
-class AcquireState private(val config: Config, val board: Board, val sheet: ScoreSheet)
-  extends MCTSStateLike[Move] with PartialState[Move] {
+class AcquireState private(
+    val config: Config,
+    val board: Board,
+    val sheet: ScoreSheet)
+  extends MCTSStateLike[Move]
+  with MCTSPartialStateLike[Move] {
 
   val numPlayers: Int = config.players.length
   val numCorps: Int = config.corps.length

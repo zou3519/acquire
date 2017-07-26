@@ -4,7 +4,11 @@ package mcts
   * Information set MCTS search
   */
 object ISMCTS {
-  def UCTSearch[Move](rootNode: ISTreeNode[Move], partialState: PartialState[Move], iterMax: Int, timeMax: Int): ISTreeNode[Move] = {
+  def UCTSearch[Move](
+                       rootNode: ISTreeNode[Move],
+                       partialState: MCTSPartialStateLike[Move],
+                       iterMax: Int,
+                       timeMax: Int): ISTreeNode[Move] = {
     var iter: Int = 0
     val start = System.currentTimeMillis
     var determinedState = partialState.determinize

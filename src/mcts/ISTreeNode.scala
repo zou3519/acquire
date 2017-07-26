@@ -30,7 +30,7 @@ class ISTreeNode[Move](val parent: ISTreeNode[Move], val move: Move, numPlayers:
     updateChildrenWithNewMoves(legalMoves)
 
     // Perform UCT selection
-    Some(children(legalMoves).sortBy(uct1(state)).last)
+    Some(children(legalMoves).maxBy(uct1(state)))
   }
 
   /* expand the ISTreeNode using the state */
